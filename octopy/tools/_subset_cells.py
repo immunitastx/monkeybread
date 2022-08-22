@@ -20,16 +20,25 @@ def subset_cells(
 ) -> AnnData:
     """Subsets cells based on gene expression and optionally labels them.
 
-    :param adata: Annotated data matrix
-    :param subset: Either a single condition or a list of conditions. Each condition contains of a
-    length-3 tuple where the first element is a column name, the second element is one of gt, gte,
-    lt, lte, or eq, and the third element is a number.
-    :param label_obs: A categorical column in `adata.obs` to add a label to if it passes the subset
-    conditions. Creates the column if it does not exist, and sets other values to "Unknown". If the
-    column exists, existing labels other than "Unknown" will take precedence.
-    :param label: The label to assign to cells passing the subset conditions in
-    `adata.obs[label_obs]`
-    :return: A copy of `adata` containing only cells matching the subset conditions
+    Parameters
+    ----------
+    adata
+        Annotated data matrix.
+    subset
+        Either a single condition or a list of conditions. Each condition consists of a length-3
+        tuple where the first element is a column name, the second element is one of gt, gte, lt,
+        lte, or eq, and the third element is a number.
+    label_obs
+        A categorical column in `adata.obs` to add a label to if it passes the subset conditions.
+        Creates the column if it does not exist, and sets other values to "Unknown". If the
+        column exists, existing labels other than "Unknown" will take precedence.
+    label
+        The label to assign to cells passing the subset conditions in `adata.obs[label_obs]`.
+
+    Returns
+    -------
+    adata_subset
+        A copy of `adata` containing only cells matching the subset conditions.
     """
 
     if type(subset) is tuple:
