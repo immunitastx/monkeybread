@@ -4,13 +4,15 @@ from anndata import AnnData
 from tqdm.notebook import tqdm
 import numpy as np
 from typing import Optional, Tuple
+from numba import njit, prange
 
 
+@njit(parallel = True)
 def randomize_positions(
-    adata: AnnData,
-    radius: float,
-    progress_bar: Optional[bool] = False,
-    return_positions: Optional[bool] = False
+        adata: AnnData,
+        radius: float,
+        progress_bar: Optional[bool] = False,
+        return_positions: Optional[bool] = False
 ) -> Optional[np.ndarray[Tuple[float, float]]]:
     """Randomizes positions within a given radius.
 
@@ -34,10 +36,13 @@ def randomize_positions(
         `adata.obsm["X_spatial_random"].
     """
 
-    r = range(adata.shape[0])
-    transformations = np.array([[math.sin(math.pi * rand.random()) * radius,
-                                math.cos(math.pi * rand.random()) * radius] for _ in
-                                (tqdm(r) if progress_bar else r)])
+    bar = lambda x: x
+    if progress_bar:
+        bar = tqdm
+    transformations = np.array(adata.shape[0])
+    for i in bar(prange(adata.shape[0])):
+        transformations[i] = [math.sin(math.pi * rand.random()) * radius,
+                              math.cos(math.pi * rand.random()) * radius]
     if return_positions:
         return transformations + adata.obsm["X_spatial"]
     else:
