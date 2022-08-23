@@ -13,7 +13,7 @@ def randomize_positions(
         radius: float,
         progress_bar: Optional[bool] = False,
         return_positions: Optional[bool] = False
-) -> Optional[np.ndarray[Tuple[float, float]]]:
+) -> Optional[np.ndarray]:
     """Randomizes positions within a given radius.
 
     Parameters

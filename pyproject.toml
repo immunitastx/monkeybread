@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 [project]
 name = "octopy-st"
-version = "0.0.7"
+version = "0.0.1b"
 authors = [
   { name="Dillon Scott", email="dillonscott.2024@gmail.com" },
 ]
