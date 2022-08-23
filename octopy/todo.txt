@@ -1,4 +1,3 @@
 TODO: Filtered plot (plot)
-TODO: Kernel density estimation (calculate, plot)
 TODO: Shortest distance from one group to another (calculate, expect, plot)
 TODO: Cell-cell touches (calculate, expected, plot)

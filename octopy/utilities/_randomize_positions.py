@@ -9,10 +9,10 @@ from numba import njit, prange
 
 @njit(parallel = True)
 def randomize_positions(
-        adata: AnnData,
-        radius: float,
-        progress_bar: Optional[bool] = False,
-        return_positions: Optional[bool] = False
+    adata: AnnData,
+    radius: float,
+    progress_bar: Optional[bool] = False,
+    return_positions: Optional[bool] = False
 ) -> Optional[np.ndarray]:
     """Randomizes positions within a given radius.
 
