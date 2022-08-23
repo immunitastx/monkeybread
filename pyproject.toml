@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 [project]
 name = "octopy-st"
-version = "0.0.1"
+version = "0.0.7"
 authors = [
   { name="Dillon Scott", email="dillonscott.2024@gmail.com" },
 ]
@@ -15,6 +15,28 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+]
+dependencies = [
+    "anndata>=0.7.4",
+    "numpy>=1.17.0",
+    "matplotlib>=3.4",
+    "pandas>=1.0",
+    "seaborn",
+    "tqdm",
+    "scikit-learn>=0.22",
+    "numba>=0.41.0",
+    "scanpy>=1.9.0"
+]
+keywords = [
+    "octopy",
+    "spatial transcriptomics",
+    "spatial analysis",
+    "single-cell",
+    "RNA-seq",
+    "MERFISH",
+    "MERSCOPE",
+    "scanpy",
+    "squidpy"
 ]
 
 [project.urls]
