@@ -1,1 +1,0 @@
-TODO: Cell-cell touches (calculate, expected, plot)

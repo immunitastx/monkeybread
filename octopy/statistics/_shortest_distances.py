@@ -37,7 +37,7 @@ def shortest_distances(
         The number of permutations to run. Defaults to 100.
     actual
         The actual distribution of shortest distances, as calculated by
-        `oc.calc.shortest_distances`.
+        `octopy.calc.shortest_distances`.
     threshold
         A distance threshold to use for significance calculation, in coordinate units.
 
