@@ -3,11 +3,9 @@ import random as rand
 from anndata import AnnData
 from tqdm.notebook import tqdm
 import numpy as np
-from typing import Optional, Tuple
-from numba import njit, prange
+from typing import Optional
 
 
-@njit(parallel = True)
 def randomize_positions(
     adata: AnnData,
     radius: float,
@@ -40,7 +38,7 @@ def randomize_positions(
     if progress_bar:
         bar = tqdm
     transformations = np.array(adata.shape[0])
-    for i in bar(prange(adata.shape[0])):
+    for i in bar(adata.shape[0]):
         transformations[i] = [math.sin(math.pi * rand.random()) * radius,
                               math.cos(math.pi * rand.random()) * radius]
     if return_positions:
