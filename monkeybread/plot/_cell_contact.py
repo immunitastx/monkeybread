@@ -14,11 +14,11 @@ def cell_contact(
     ax: Optional[plt.Axes] = None,
     **kwargs
 ) -> Optional[plt.Axes]:
-    """Plots the results of :func:`~octopy.calc.cell_contact`.
+    """Plots the results of :func:`~monkeybread.calc.cell_contact`.
 
     Two different plots are produced depending on input. If `expected_contacts` is omitted, the
     output plot will be an embedding showing the spatial positions of the cells in contact. If
-    `expected_contacts` contains the result of `octopy.stat.cell_contact`, the output will be a
+    `expected_contacts` contains the result of `monkeybread.stat.cell_contact`, the output will be a
     histogram displaying the distribution of contacts from the permutation test with a line showing
     the actual distribution of contact counts.
 
@@ -27,9 +27,9 @@ def cell_contact(
     adata
         Annotated data matrix.
     contacts
-        The actual cell contacts, as calculated by `octopy.calc.cell_contact`.
+        The actual cell contacts, as calculated by `monkeybread.calc.cell_contact`.
     expected_contacts
-        The expected cell contacts, as calculated by `octopy.stat.cell_contact`.
+        The expected cell contacts, as calculated by `monkeybread.stat.cell_contact`.
     show
         Whether to show the plot or return the Axes object.
     ax

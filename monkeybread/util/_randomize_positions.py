@@ -17,7 +17,7 @@ def randomize_positions(
     Parameters
     ----------
     adata
-        Annotated data matrix. Coordinates are taken from `adata.obsm["X_spatial"]`
+        Annotated data matrix. Coordinates are taken from `adata.obsm["X_spatial"]`.
     radius
         Radius to randomize within. Measured in same units as coordinates.
     progress_bar
@@ -29,9 +29,9 @@ def randomize_positions(
     Returns
     -------
     random_coords
-        If `return_positions=True`, returns a list of the randomized coordinates corresponding to
+        If `return_positions = True`, returns a list of the randomized coordinates corresponding to
         the coordinates in `adata.obsm["X_spatial"]`. Otherwise, these coordinates are assigned to
-        `adata.obsm["X_spatial_random"].
+        `adata.obsm["X_spatial_random"]`.
     """
 
     bar = lambda x: x

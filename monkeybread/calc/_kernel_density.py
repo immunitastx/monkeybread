@@ -3,10 +3,8 @@ from typing import Union, Optional, List, Dict
 from collections import defaultdict, Counter
 from sklearn.metrics import pairwise_distances
 import numpy as np
-from numba import njit
 
 
-@njit(parallel = True)
 def kernel_density(
     adata: AnnData,
     groupby: Optional[str] = "all",
