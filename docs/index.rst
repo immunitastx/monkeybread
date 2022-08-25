@@ -1,9 +1,9 @@
 Welcome to Monkeybread's documentation!
-==================================
+=======================================
 
 .. toctree::
-    :maxdepth: 1
     :hidden:
+    :maxdepth: 1
     :caption: Contents:
 
     api

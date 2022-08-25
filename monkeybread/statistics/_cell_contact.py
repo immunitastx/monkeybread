@@ -29,12 +29,12 @@ def cell_contact(
     group2
         Either one group or a list of groups from `adata.obs[groupby]`.
     actual_contact
-         The actual cell contacts, as calculated by `octopy.calc.cell_contact`.
+         The actual cell contacts, as calculated by `monkeybread.calc.cell_contact`.
     contact_radius
         The radius in which cells are considered touching. If not provided, will be calculated using
         half of the average radius of group1 + half of the average radius of group2. This requires
         width and height columns to be present in `adata.obs`. Should be the same as used in
-        `octopy.calc.cell_contact`.
+        `monkeybread.calc.cell_contact`.
     perm_radius
         The radius within which to randomize location, in coordinate units.
     n_perms

@@ -15,10 +15,10 @@ def shortest_distances(
     Parameters
     ----------
     distances
-        The shortest distances, as calculated by :func:`~octopy.calc.shortest_distances`.
+        The shortest distances, as calculated by :func:`~monkeybread.calc.shortest_distances`.
     expected_distances
         The expected distances, with optional threshold and p-value, as calculated by
-        :func:`~octopy.stat.shortest_distances`.
+        :func:`~monkeybread.stat.shortest_distances`.
     show
         If true, displays the plot(s). If false, returns the Axes instead.
     kwargs
