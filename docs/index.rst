@@ -1,13 +1,9 @@
-Welcome to Octopy's documentation!
+Welcome to Monkeybread's documentation!
 ==================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 1
+    :hidden:
+    :caption: Contents:
 
-.. automodule:: octopy
-   :members:
-   :private-members:
-   :undoc-members:
-   :special-members:
-
+    api

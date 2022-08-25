@@ -1,6 +1,6 @@
 from anndata import AnnData
 import numpy as np
-from octopy import calc, util
+import monkeybread as mb
 from typing import Optional, Union, List, Dict, Set, Tuple
 import statsmodels.stats.weightstats as sm
 
@@ -53,9 +53,9 @@ def cell_contact(
     num_touches = lambda t: sum([len(v) for v in t.values()])
     expected_touches = np.zeros(n_perms)
     for i in range(n_perms):
-        util.randomize_positions(data_groups, radius = perm_radius)
-        touches = calc.cell_contact(data_groups, groupby, group1, group2,
-                                    radius = contact_radius, basis = "spatial_random")
+        mb.util.randomize_positions(data_groups, radius = perm_radius)
+        touches = mb.calc.cell_contact(data_groups, groupby, group1, group2,
+                                       radius = contact_radius, basis = "spatial_random")
         expected_touches[i] = num_touches(touches)
     if actual_contact is not None:
         num_touches = sum([len(v) for v in actual_contact.values()])
