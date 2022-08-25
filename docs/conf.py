@@ -1,3 +1,7 @@
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -39,3 +43,17 @@ html_theme_options = {
 html_static_path = ['_static']
 html_css_files = ["css/custom.css", "css/sphinx_prompt_css.css"]
 html_js_files = ["js/expand_tabs.js"]
+
+
+# Autodoc configs
+autodoc_default_options = {
+    'members': True,
+    'member-order': 'alphabetical',
+    'special-members': True,
+    'undoc-members': True,
+}
+autodoc_typehints = 'both'
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_use_rtype = False  # having a separate entry generally helps readability

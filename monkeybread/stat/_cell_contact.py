@@ -16,7 +16,7 @@ def cell_contact(
     n_perms: Optional[int] = 100,
 ) -> Union[np.ndarray, Tuple[np.ndarray, float]]:
     """Calculates expected cell contact and p-value using a permutation test as described in \
-    :link:`ncbi.nlm.nih.gov/pmc/articles/PMC9262715/`.
+    `this paper<ncbi.nlm.nih.gov/pmc/articles/PMC9262715/>`.
 
     Parameters
     ----------
