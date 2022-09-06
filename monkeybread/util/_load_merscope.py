@@ -6,7 +6,6 @@ import pandas as pd
 import numpy as np
 import h5py
 
-
 default_paths = {
     "cache": "adata.h5ad",
     "counts": "cell_by_gene.csv",
@@ -23,8 +22,36 @@ def load_merscope(
     transcript_locations: Optional[bool] = None,
     paths: Optional[Dict[str, str]] = None
 ) -> ad.AnnData:
+    """Loads data from MERSCOPE, in accordance to the folder structure of the FFPE data release.
+
+    Parameters
+    ----------
+    folder
+        A path from the current working directory to the folder containing the MERSCOPE data.
+    use_cache
+        Whether or not to use a cached AnnData object. Default is to use it if it exists.
+    cell_bounds
+        Whether or not to include cell boundaries in a column in the resulting AnnData object.
+        Default is to include if the folder exists.
+    transcript_locations
+        Whether or not to include transcript locations in `.uns['transcripts']` in the resulting
+        AnnData object. Default is to include if the file exists.
+    paths
+        Paths to each of the files output by MERSCOPE. Defaults are `cache: 'adata.h5ad'`,
+        `counts: 'cell_by_gene.csv'`, `coordinates: 'cell_metadata.csv'`,
+        `cell_bounds: 'cell_boundaries/'`, and `transcripts: 'detected_transcripts.csv'`. Default
+        values will be filled in if an incomplete dictionary is provided.
+
+    Returns
+    -------
+    adata
+        An annotated data matrix containing spatial data from MERSCOPE.
+    """
     if paths is None:
-        paths = default_paths
+        paths = {}
+    for k, v in default_paths.items():
+        if k not in paths:
+            paths[k] = v
     if use_cache or (use_cache is None and os.path.exists(f"{folder}/{paths['cache']}")):
         return ad.read(f"{folder}/{paths['cache']}")
     else:
