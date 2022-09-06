@@ -18,6 +18,7 @@ Calculations (``calc``)
     calc.cell_contact
     calc.kernel_density
     calc.shortest_distances
+    calc.cell_transcript_proximity
 
 Plotting (``plot``)
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -32,6 +33,7 @@ Plotting (``plot``)
     plot.cell_contact
     plot.kernel_density
     plot.shortest_distances
+    plot.cell_transcript_proximity
 
 Statistics (``stat``)
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,3 +60,4 @@ Utilities (``util``)
 
     util.randomize_positions
     util.subset_cells
+    util.load_merscope
