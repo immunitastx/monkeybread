@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 [project]
 name = "monkeybread"
-version = "0.0.1b0"
+version = "0.0.2b"
 authors = [
     { name="Dillon Scott", email="dillonscott.2024@gmail.com" },
 ]
