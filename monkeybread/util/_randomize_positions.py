@@ -38,7 +38,7 @@ def randomize_positions(
     if progress_bar:
         bar = tqdm
     transformations = np.array(adata.shape[0])
-    for i in bar(adata.shape[0]):
+    for i in bar(range(adata.shape[0])):
         transformations[i] = [math.sin(math.pi * rand.random()) * radius,
                               math.cos(math.pi * rand.random()) * radius]
     if return_positions:
