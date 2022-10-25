@@ -77,7 +77,7 @@ def cell_contact(
         touches = mb.calc.cell_contact(data_groups, groupby, group1, group2,
                                        radius = contact_radius, basis = "spatial_random")
         expected_touches[i] = num_touches(touches)
-    num_touches = sum([len(v) for v in actual_contact.values()])
-    t_score, p_val = sm.ztest(x1 = expected_touches, x2 = [num_touches],
+    actual_touches = num_touches(actual_contact)
+    t_score, p_val = sm.ztest(x1 = expected_touches, value = actual_touches,
                               alternative = "smaller")
     return expected_touches, p_val
