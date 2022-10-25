@@ -63,7 +63,7 @@ def cell_contact(
     if split_groups:
         df_dict = {
             g1: {g2: cell_contact(adata, groupby, g1, g2, actual_contact, contact_radius,
-                                  perm_radius, n_perms, split_groups = False) for g2 in group2}
+                                  perm_radius, n_perms, split_groups = False)[1] for g2 in group2}
             for g1 in group1
         }
         return pd.DataFrame(df_dict)
