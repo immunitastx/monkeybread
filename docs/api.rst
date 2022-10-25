@@ -30,10 +30,13 @@ Plotting (``plot``)
 .. autosummary::
     :toctree: api
 
-    plot.cell_contact
+    plot.cell_contact_embedding
+    plot.cell_contact_histplot
+    plot.cell_contact_heatmap
     plot.kernel_density
     plot.shortest_distances
     plot.cell_transcript_proximity
+    plot.volcano_plot
 
 Statistics (``stat``)
 ~~~~~~~~~~~~~~~~~~~~~~~

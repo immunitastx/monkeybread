@@ -3,7 +3,7 @@ import anndata as ad
 import scanpy as sc
 import numpy as np
 import seaborn as sns
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 
 def volcano_plot(

@@ -1,6 +1,6 @@
-﻿monkeybread.plot.cell\_contact
+﻿monkeybread.plot.volcano\_plot
 ==============================
 
 .. currentmodule:: monkeybread.plot
 
-.. autofunction:: cell_contact
+.. autofunction:: volcano_plot
