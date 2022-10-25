@@ -67,10 +67,12 @@ def cell_contact(
             for g1 in group1
         }
         return pd.DataFrame(df_dict)
-    both_groups = set(group1).union(set(group2))
-    data_groups = adata[[g in both_groups for g in adata.obs[groupby]]].copy()
-    num_touches = lambda t: sum([0 if k not in group1 else sum([g2 in group2 for g2 in v]) for k, v
-                                 in t.items()])
+    group1_cells = adata[[g in group1 for g in adata.obs[groupby]]].obs.index
+    group2_cells = adata[[g in group2 for g in adata.obs[groupby]]].obs.index
+    data_groups = adata[group1_cells.append(group2_cells)].copy()
+    num_touches = lambda t: sum(
+        [0 if k not in group1_cells else sum([g2 in group2_cells for g2 in v]) for k, v
+         in t.items()])
     expected_touches = np.zeros(n_perms)
     for i in range(n_perms):
         mb.util.randomize_positions(data_groups, radius = perm_radius)
@@ -78,6 +80,8 @@ def cell_contact(
                                        radius = contact_radius, basis = "spatial_random")
         expected_touches[i] = num_touches(touches)
     actual_touches = num_touches(actual_contact)
+    if np.sum(expected_touches) == 0:
+        return expected_touches, (0.0 if actual_touches > 0 else 1.0)
     t_score, p_val = sm.ztest(x1 = expected_touches, value = actual_touches,
                               alternative = "smaller")
     return expected_touches, p_val
