@@ -87,9 +87,6 @@ class SparseSampleTest(TestCellContact):
     def test_auto_radius_calculation(self):
         super().assert_total_contact("DC", "T", 4)
 
-    def test_auto_radius_calculation_2(self):
-        super().assert_total_contact("DC", "T", 5)
-
 
 if __name__ == '__main__':
     test_classes = [DenseSampleTest, SparseSampleTest]
