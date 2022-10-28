@@ -5,12 +5,12 @@ import numpy as np
 
 
 def cell_contact(
-    adata: AnnData,
-    groupby: str,
-    group1: Union[str, List[str]],
-    group2: Union[str, List[str]],
-    basis: Optional[str] = "spatial",
-    radius: Optional[float] = None,
+        adata: AnnData,
+        groupby: str,
+        group1: Union[str, List[str]],
+        group2: Union[str, List[str]],
+        basis: Optional[str] = "spatial",
+        radius: Optional[float] = None,
 ) -> Dict[str, Set[str]]:
     """Detects contact between two groups of cells.
 
@@ -54,6 +54,15 @@ def cell_contact(
     group1_indices = group1_cells.obs.index[mask]
     group2_indices = [group2_cells.obs.index[index] for index in indices[mask]]
     touches = {
-        g1_index: set(g2_indices) for g1_index, g2_indices in zip(group1_indices, group2_indices)
+        g1_index: set(g2_indices).difference({g1_index}) for g1_index, g2_indices in
+        zip(group1_indices, group2_indices)
     }
-    return touches
+    mutual_contact_removed = {}
+    for k, v in touches.items():
+        mutual_contact_removed[k] = set(filter(lambda c: c not in mutual_contact_removed or
+                                                         k not in mutual_contact_removed[c],
+                                               v))
+    contact_empty_removed = {
+        k: v for k, v in mutual_contact_removed.items() if len(v) > 0
+    }
+    return contact_empty_removed
