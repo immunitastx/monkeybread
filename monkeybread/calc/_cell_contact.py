@@ -12,7 +12,9 @@ def cell_contact(
         basis: Optional[str] = "spatial",
         radius: Optional[float] = None,
 ) -> Dict[str, Set[str]]:
-    """Detects contact between two groups of cells.
+    """Detects contact between two groups of cells. Note that the output only measures unique
+    contacts, and will not double-count. For example, if cell A is contacting cell B, and both cells
+    are in both `group1` and `group2`, the output may contain A -> B or B -> A, but not both.
 
     Parameters
     ----------

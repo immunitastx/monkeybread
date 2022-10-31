@@ -68,8 +68,10 @@ def cell_contact(
     # Sums the number of contacts given the contact dictionary and ids corresponding to cells that
     # count for each group
     contact_count = lambda contacts, g1, g2: sum(
-        [0 if key not in g1 else sum([v in g2 for v in values]) for key, values
-         in contacts.items()])
+        [0 if key not in g1 else sum([v in g2 for v in values])
+         for key, values in contacts.items()]) + sum(
+        [0 if key not in g2 else sum([v in g1 for v in values])
+         for key, values in contacts.items()])
 
     # Runs through position permutations
     if split_groups:

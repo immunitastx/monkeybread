@@ -10,6 +10,7 @@ import pandas as pd
 def cell_contact_embedding(
     adata: AnnData,
     contacts: Dict[str, Set[str]],
+    basis: Optional[str] = "spatial",
     show: Optional[bool] = False,
     ax: Optional[plt.Axes] = None,
     **kwargs
@@ -24,6 +25,8 @@ def cell_contact_embedding(
         Annotated data matrix.
     contacts
         The actual cell contacts, as calculated by `monkeybread.calc.cell_contact`.
+    basis
+        Grouping in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     show
         Whether to show the plot or return the Axes object.
     ax
@@ -39,13 +42,13 @@ def cell_contact_embedding(
     """
     if ax is None:
         ax = plt.axes()
-    cell_list = list(contacts.keys())
+    cell_list = set(contacts.keys())
     for s in contacts.values():
-        cell_list.extend(s)
-    adata_contact = adata[cell_list].copy()
+        cell_list.union(s)
+    adata_contact = adata[list(cell_list)].copy()
     sc.pl.embedding(
         adata,
-        basis = "spatial",
+        basis = basis,
         na_color = "lightgrey",
         show = False,
         alpha = 0.5,
@@ -55,7 +58,7 @@ def cell_contact_embedding(
     )
     sc.pl.embedding(
         adata_contact,
-        basis = "spatial",
+        basis = basis,
         show = False,
         ax = ax,
         na_color = "red",
@@ -132,7 +135,7 @@ def cell_contact_heatmap(
     Produces a heatmap where rows correspond to `group1` and columns correspond to `group2`.
     An entry in the heatmap depicts either the raw contact frequencies or the p-values for those
     contact frequencies, depending on whether `expected_contacts` is provided. Annotations of
-    contact counts are overlaid on each entry.
+    cells are included by default.
 
     Parameters
     ----------
@@ -162,8 +165,8 @@ def cell_contact_heatmap(
     """
     if ax is None:
         ax = plt.axes()
-    group1 = set(adata[contacts.keys()].obs[groupby])
-    group2 = set(adata[np.flatten(contacts.values())].obs[groupby])
+    group1 = set(adata[list(contacts.keys())].obs[groupby])
+    group2 = set(adata[[v for vals in contacts.values() for v in vals]].obs[groupby])
     contacting_counts = {
         g1: {g2: 0 for g2 in group2} for g1 in group1
     }
@@ -177,7 +180,9 @@ def cell_contact_heatmap(
 
     if expected_contacts is not None:
         contact_df_normalized = expected_contacts.T
+        contact_df_annot = contact_df_normalized
     else:
+        contact_df_annot = contact_df
         contact_df_normalized = contact_df.T.apply(
             lambda arr: arr / (np.sum(arr) if np.sum(arr) > 0 else 1), axis = 1, raw = True
         )
@@ -185,7 +190,7 @@ def cell_contact_heatmap(
     sns.heatmap(contact_df_normalized,
                 ax = ax,
                 cmap = f'plasma{"_r" if expected_contacts is not None else ""}',
-                annot = contact_df,
+                annot = contact_df_annot,
                 **kwargs)
     if show:
         plt.show()

@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.abspath('..'))
 project = 'Monkeybread'
 copyright = '2022, Immunitas Therapeutics'
 author = 'Immunitas Therapeutics'
-release = '0.1.5'
+release = '0.1.7'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

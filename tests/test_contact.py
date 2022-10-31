@@ -57,6 +57,29 @@ class DenseSampleTest(TestCellContact):
     def test_auto_radius_calculation(self):
         super().assert_total_contact("DC", "T", 17)
 
+    def test_group_contact(self):
+        super().assert_total_contact(["DC", "T"], "T", 6, radius = 1)
+
+    def test_insignificance(self):
+        actual_contact = mb.calc.cell_contact(self.adata, "cell_type", "DC", "T", radius = 2)
+        perm_dist, p_val = mb.stat.cell_contact(self.adata, "cell_type", "DC", "T", actual_contact,
+                                                contact_radius = 2, perm_radius = 1)
+        super().assertGreater(
+            p_val,
+            0.05,
+            f"Expected insignificant p value, received {p_val}"
+        )
+
+    def test_significance(self):
+        actual_contact = mb.calc.cell_contact(self.adata, "cell_type", "DC", "T", radius = 2)
+        perm_dist, p_val = mb.stat.cell_contact(self.adata, "cell_type", "DC", "T", actual_contact,
+                                                contact_radius = 2, perm_radius = 50)
+        super().assertLess(
+            p_val,
+            0.05,
+            f"Expected significant p value, received {p_val}"
+        )
+
 
 class SparseSampleTest(TestCellContact):
 
@@ -86,6 +109,16 @@ class SparseSampleTest(TestCellContact):
 
     def test_auto_radius_calculation(self):
         super().assert_total_contact("DC", "T", 4)
+
+    def test_significance(self):
+        actual_contact = mb.calc.cell_contact(self.adata, "cell_type", "DC", "T", radius = 2)
+        perm_dist, p_val = mb.stat.cell_contact(self.adata, "cell_type", "DC", "T", actual_contact,
+                                                contact_radius = 2, perm_radius = 5)
+        super().assertLess(
+            p_val,
+            0.05,
+            f"Expected significant p value, received {p_val}"
+        )
 
 
 if __name__ == '__main__':
