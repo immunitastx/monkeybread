@@ -1,66 +1,61 @@
-API
-===
+# API
 
-Import statement::
+## Calculations
 
-    import monkeybread as mb
-
-Calculations (``calc``)
-~~~~~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: monkeybread.calc
-
+```{eval-rst}
+.. module:: monkeybread.calc
 .. currentmodule:: monkeybread
 
 .. autosummary::
-    :toctree: api
+    :toctree: generated
 
     calc.cell_contact
+    calc.cell_transcript_proximity
     calc.kernel_density
     calc.shortest_distances
-    calc.cell_transcript_proximity
+```
 
-Plotting (``plot``)
-~~~~~~~~~~~~~~~~~~~~~~~
+## Plotting
 
-.. automodule:: monkeybread.plot
-
+```{eval-rst}
+.. module:: monkeybread.plot
 .. currentmodule:: monkeybread
 
 .. autosummary::
-    :toctree: api
+    :toctree: generated
 
     plot.cell_contact_embedding
     plot.cell_contact_histplot
     plot.cell_contact_heatmap
+    plot.cell_transcript_proximity
     plot.kernel_density
     plot.shortest_distances
-    plot.cell_transcript_proximity
     plot.volcano_plot
+```
 
-Statistics (``stat``)
-~~~~~~~~~~~~~~~~~~~~~~~
+## Statistical Tests
 
-.. automodule:: monkeybread.stat
-
+```{eval-rst}
+.. module:: monkeybread.stat
 .. currentmodule:: monkeybread
 
 .. autosummary::
-    :toctree: api
+    :toctree: generated
 
     stat.cell_contact
     stat.shortest_distances
+```
 
-Utilities (``util``)
-~~~~~~~~~~~~~~~~~~~~~~~
+## Utility Functions
 
-.. automodule:: monkeybread.util
-
+```{eval-rst}
+.. module:: monkeybread.util
 .. currentmodule:: monkeybread
 
 .. autosummary::
-    :toctree: api
+    :toctree: generated
 
+    util.load_merscope
     util.randomize_positions
     util.subset_cells
-    util.load_merscope
+```
