@@ -1,6 +1,7 @@
 import anndata as ad
 import numpy as np
 from typing import List, Dict, Optional, Tuple
+import pytest
 
 
 def create_sample(data: Dict[str, List[List[float]]], dims: Optional[Tuple[float, float]] = None):
@@ -23,40 +24,45 @@ def create_sample(data: Dict[str, List[List[float]]], dims: Optional[Tuple[float
     return sample
 
 
-dense_sample = create_sample({
-    "DC": [
-        [2, 2],
-        [2.5, 6.5],
-        [3, 6],
-        [4, 5],
-        [5, 8],
-        [7, 5],
-    ],
-    "T": [
-        [3, 4],
-        [3, 5],
-        [4, 4],
-        [4, 7],
-        [5, 6],
-        [5.5, 5],
-        [6, 4],
-        [6, 2],
-        [8, 5],
-        [8, 7]
-    ]
-}, dims = (2, 2))
+@pytest.fixture(scope = "module")
+def dense_sample():
+    return create_sample({
+        "DC": [
+            [2, 2],
+            [2.5, 6.5],
+            [3, 6],
+            [4, 5],
+            [5, 8],
+            [7, 5],
+        ],
+        "T": [
+            [3, 4],
+            [3, 5],
+            [4, 4],
+            [4, 7],
+            [5, 6],
+            [5.5, 5],
+            [6, 4],
+            [6, 2],
+            [8, 5],
+            [8, 7]
+        ]
+    }, dims = (2, 2))
 
-sparse_sample = create_sample({
-    "DC": [
-        [1, 8],
-        [6, 1]
-    ],
-    "T": [
-        [1, 5],
-        [2, 7],
-        [2, 8],
-        [4, 3],
-        [5, 1],
-        [6, 2]
-    ]
-}, dims = (1, 3))
+
+@pytest.fixture(scope = "module")
+def sparse_sample():
+    return create_sample({
+        "DC": [
+            [1, 8],
+            [6, 1]
+        ],
+        "T": [
+            [1, 5],
+            [2, 7],
+            [2, 8],
+            [4, 3],
+            [5, 1],
+            [6, 2]
+        ]
+    }, dims = (1, 3))
