@@ -89,6 +89,7 @@ intersphinx_mapping = {
     "anndata": ("https://anndata.readthedocs.io/en/stable/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     "scanpy": ("https://scanpy.readthedocs.io/en/stable/", None),
+    "seaborn": ('https://seaborn.pydata.org/', None)
 }
 
 
