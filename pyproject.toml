@@ -20,7 +20,14 @@ urls.Documentation = "https://monkeybread.readthedocs.io/"
 urls.Source = "https://github.com/immunitastx/monkeybread"
 urls.Home-page = "https://github.com/immunitastx/monkeybread"
 dependencies = [
-    "anndata",
+    "scanpy>=1.9.0",
+    "anndata>=0.7.4",
+    "numpy>=1.17.0",
+    "matplotlib>=3.4",
+    "pandas>=1.0",
+    "seaborn",
+    "tqdm",
+    "scikit-learn>=0.22",
     # for debug logging (referenced from the issue template)
     "session-info"
 ]
