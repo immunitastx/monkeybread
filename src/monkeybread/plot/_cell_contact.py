@@ -16,7 +16,7 @@ def cell_contact_embedding(
     **kwargs
 ) -> Optional[plt.Axes]:
     """
-    Plots the results of :func:`~monkeybread.calc.cell_contact`, showing spatial positions of cells
+    Plots the results of :func:`mb.calc.cell_contact`, showing spatial positions of cells
     in contact.
 
     Parameters
@@ -24,7 +24,7 @@ def cell_contact_embedding(
     adata
         Annotated data matrix.
     contacts
-        The actual cell contacts, as calculated by `monkeybread.calc.cell_contact`.
+        The actual cell contacts, as calculated by :func:`mb.calc.cell_contact`.
     basis
         Grouping in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     show
@@ -32,7 +32,7 @@ def cell_contact_embedding(
     ax
         An Axes object to add the plots to.
     kwargs
-        Keyword arguments that will be passed to `scanpy.pl.embedding`.
+        Keyword arguments that will be passed to :func:`scanpy.pl.embedding`.
 
     Returns
     -------
