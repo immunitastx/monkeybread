@@ -32,7 +32,7 @@ def test_dense_contact_radius_reflexivity(dense_sample):
 
 
 def test_dense_contact_radius_self_count(dense_sample):
-    assert_total_contact(dense_sample, "DC", "DC", 1, radius = 1)
+    assert_total_contact(dense_sample, "DC", "DC", 2, radius = 1)
 
 
 def test_dense_auto_radius_calculation(dense_sample):
@@ -82,7 +82,7 @@ def test_sparse_contact_radius_reflexivity(sparse_sample):
 
 
 def test_sparse_contact_radius_self_count(sparse_sample):
-    assert_total_contact(sparse_sample, "T", "T", 2, radius = 2)
+    assert_total_contact(sparse_sample, "T", "T", 4, radius = 2)
 
 
 def test_sparse_auto_radius_calculation(sparse_sample):

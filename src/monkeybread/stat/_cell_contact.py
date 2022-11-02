@@ -65,13 +65,10 @@ def cell_contact(
     # Pull out cells corresponding to both groups
     group_cells = adata[[g in group1 or g in group2 for g in adata.obs[groupby]]].copy()
 
-    # Sums the number of contacts given the contact dictionary and ids corresponding to cells that
-    # count for each group
-    contact_count = lambda contacts, g1, g2: sum(
-        [0 if key not in g1 else sum([v in g2 for v in values])
-         for key, values in contacts.items()]) + sum(
-        [0 if key not in g2 else sum([v in g1 for v in values])
-         for key, values in contacts.items()])
+    # Sums the number of unique contacts given the contact dictionary and ids corresponding to cells
+    # that count for each group
+    contact_count = lambda contacts, g1, g2: sum(len(v) for v in contacts.values()) - 0.5 * \
+        sum(0 if k not in g1 else sum(v in g2 for v in values) for k, values in contacts.items())
 
     # Runs through position permutations
     if split_groups:

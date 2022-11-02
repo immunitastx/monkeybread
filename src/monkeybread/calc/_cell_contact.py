@@ -12,9 +12,10 @@ def cell_contact(
         basis: Optional[str] = "spatial",
         radius: Optional[float] = None,
 ) -> Dict[str, Set[str]]:
-    """Detects contact between two groups of cells. Note that the output only measures unique
-    contacts, and will not double-count. For example, if cell A is contacting cell B, and both cells
-    are in both `group1` and `group2`, the output may contain A -> B or B -> A, but not both.
+    """Detects contact between two groups of cells. The output takes the form of a dictionary
+    mapping from cells in `group1` to cells in `group2` that the cell contacts. If a cell is present
+    in both `group1` and `group2`, the mapping will be reflexive - the cell may both appear in the
+    keys and the values.
 
     Parameters
     ----------
@@ -59,12 +60,7 @@ def cell_contact(
         g1_index: set(g2_indices).difference({g1_index}) for g1_index, g2_indices in
         zip(group1_indices, group2_indices)
     }
-    mutual_contact_removed = {}
-    for k, v in touches.items():
-        mutual_contact_removed[k] = set(filter(lambda c: c not in mutual_contact_removed or
-                                                         k not in mutual_contact_removed[c],
-                                               v))
     contact_empty_removed = {
-        k: v for k, v in mutual_contact_removed.items() if len(v) > 0
+        k: v for k, v in touches.items() if len(v) > 0
     }
     return contact_empty_removed
