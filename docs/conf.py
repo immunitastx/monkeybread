@@ -107,16 +107,20 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_book_theme"
-html_static_path = ["_static"]
+html_theme = 'scanpydoc'
+html_theme_options = dict(
+    navigation_depth=4,
+    logo_only=True,
+    docsearch_index='scanpy',
+    docsearch_key='fa4304eb95d2134997e3729553a674b2',
+    repository_url=repository_url,
+    use_repository_button=True,
+)
+html_static_path = ['_static']
+html_show_sphinx = False
 html_title = project_name
 html_logo = '_static/logo.png'
 html_favicon = '_static/logo.png'
-
-html_theme_options = {
-    "repository_url": repository_url,
-    "use_repository_button": True,
-}
 
 pygments_style = "default"
 
