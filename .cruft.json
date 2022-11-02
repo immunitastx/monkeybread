@@ -1,7 +1,7 @@
 {
   "template": "https://github.com/scverse/cookiecutter-scverse",
-  "commit": "f19ba436fd40fa52382687a6a1030b1507c379fc",
-  "checkout": null,
+  "commit": "28f47a97470826ca5000df24fd272e0d32d1c6fa",
+  "checkout": "v0.1.0",
   "context": {
     "cookiecutter": {
       "project_name": "monkeybread",
