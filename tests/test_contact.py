@@ -8,12 +8,13 @@ def assert_total_contact(adata, group1, group2, expected_num, radius = None, **k
     observed_num = sum(len(v) for v in observed_contact.values())
     assert observed_num == expected_num
 
+
 def assert_unique_contact(adata, group1, group2, expected_num, radius = None, **kwargs):
     observed_contact = mb.calc.cell_contact(adata, "cell_type", group1, group2,
                                             radius = radius, **kwargs)
-    observed_num = sum(len(v) for v in observed_contact.values()) - 0.5 * \
-        sum(0 if k not in group2 else sum(v in group1 for v in values) for k, values in
-            observed_contact.items())
+    observed_num = sum(len(v) for v in observed_contact.values()) - \
+        int(0.5 * sum(0 if k not in group1 else sum(v in group1 for v in values) for
+            k, values in observed_contact.items()))
     assert observed_num == expected_num
 
 
