@@ -67,8 +67,9 @@ def cell_contact(
 
     # Sums the number of unique contacts given the contact dictionary and ids corresponding to cells
     # that count for each group
-    contact_count = lambda contacts, g1, g2: sum(len(v) for v in contacts.values()) - int(0.5 * \
-        sum(0 if k not in g1 else sum(v in g1 for v in values) for k, values in contacts.items()))
+    contact_count = lambda contacts, g1, g2: sum(len(v) for v in contacts.values()) - \
+        int(0.5 * sum(0 if k not in g1 else sum(v in g1 for v in values) for
+            k, values in contacts.items()))
 
     # Runs through position permutations
     if split_groups:
