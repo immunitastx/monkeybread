@@ -10,11 +10,11 @@ def assert_total_contact(adata, group1, group2, expected_num, radius = None, **k
 
 
 def assert_unique_contact(adata, group1, group2, expected_num, radius = None, **kwargs):
-    g1 = adata[[c in group1 for c in adata.obs["cell_type"]]].obs.index
+    g2 = adata[[c in group2 for c in adata.obs["cell_type"]]].obs.index
     observed_contact = mb.calc.cell_contact(adata, "cell_type", group1, group2,
                                             radius = radius, **kwargs)
     observed_num = sum(len(v) for v in observed_contact.values()) - \
-        int(0.5 * sum(0 if k not in g1 else sum(v in g1 for v in values) for
+        int(0.5 * sum(0 if k not in g2 else sum(v in g2 for v in values) for
             k, values in observed_contact.items()))
     assert observed_num == expected_num
 
@@ -106,5 +106,5 @@ def test_sparse_significance(sparse_sample):
     actual_contact = mb.calc.cell_contact(sparse_sample, "cell_type", "DC", "T",
                                           radius = 2)
     perm_dist, p_val = mb.stat.cell_contact(sparse_sample, "cell_type", "DC", "T",
-                                            actual_contact, contact_radius = 2, perm_radius = 5)
+                                            actual_contact, contact_radius = 2, perm_radius = 10)
     assert p_val < 0.05
