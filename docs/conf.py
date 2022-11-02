@@ -9,6 +9,7 @@ import sys
 from datetime import datetime
 from importlib.metadata import metadata
 from pathlib import Path
+import sphinx_rtd_theme
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE / "extensions"))
@@ -53,6 +54,7 @@ extensions = [
     "sphinxcontrib.bibtex",
     "sphinx_autodoc_typehints",
     "sphinx.ext.mathjax",
+    "sphinx_rtd_theme",
     *[p.stem for p in (HERE / "extensions").glob("*.py")],
 ]
 
@@ -107,13 +109,13 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_book_theme'
+html_theme = 'sphinx_rtd_theme'
 html_theme_options = dict(
     navigation_depth=4,
     logo_only=True,
-    repository_url=repository_url,
-    use_repository_button=True,
+    style_nav_header_background="#343131"
 )
+github_url = repository_url
 html_static_path = ['_static']
 html_show_sphinx = False
 html_title = project_name
