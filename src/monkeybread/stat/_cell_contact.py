@@ -18,7 +18,7 @@ def cell_contact(
         split_groups: Optional[bool] = False,
 ) -> Union[Tuple[np.ndarray, float], pd.DataFrame]:
     """Calculates expected cell contact and p-value using a permutation test as described in
-    `this paper <https://ncbi.nlm.nih.gov/pmc/articles/PMC9262715/>`.
+    :cite:p:`Fang2022`.
 
     Parameters
     ----------
