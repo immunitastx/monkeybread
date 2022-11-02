@@ -1,6 +1,12 @@
 # API
 
-## Calculations
+Import Monkeybread as:
+
+```
+import monkeybread as mb
+```
+
+## Calculations: `calc`
 
 ```{eval-rst}
 .. module:: monkeybread.calc
@@ -15,7 +21,7 @@
     calc.shortest_distances
 ```
 
-## Plotting
+## Plotting: `plot`
 
 ```{eval-rst}
 .. module:: monkeybread.plot
@@ -33,7 +39,7 @@
     plot.volcano_plot
 ```
 
-## Statistical Tests
+## Statistical Tests: `stat`
 
 ```{eval-rst}
 .. module:: monkeybread.stat
@@ -46,7 +52,7 @@
     stat.shortest_distances
 ```
 
-## Utility Functions
+## Utility Functions: `util`
 
 ```{eval-rst}
 .. module:: monkeybread.util

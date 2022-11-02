@@ -18,7 +18,7 @@ def cell_contact(
         split_groups: Optional[bool] = False,
 ) -> Union[Tuple[np.ndarray, float], pd.DataFrame]:
     """Calculates expected cell contact and p-value using a permutation test as described in
-    `this paper <https://ncbi.nlm.nih.gov/pmc/articles/PMC9262715/>`.
+    :cite:p:`Fang2022`.
 
     Parameters
     ----------
@@ -31,12 +31,12 @@ def cell_contact(
     group2
         Either one group or a list of groups from `adata.obs[groupby]`.
     actual_contact
-         The actual cell contacts, as calculated by `monkeybread.calc.cell_contact`.
+         The actual cell contacts, as calculated by :func:`monkeybread.calc.cell_contact`.
     contact_radius
         The radius in which cells are considered touching. If not provided, will be calculated using
         half of the average radius of group1 + half of the average radius of group2. This requires
         width and height columns to be present in `adata.obs`. Should be the same as used in
-        `monkeybread.calc.cell_contact`.
+        :func:`monkeybread.calc.cell_contact`.
     perm_radius
         The radius within which to randomize location, in coordinate units.
     n_perms

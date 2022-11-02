@@ -16,7 +16,7 @@ def cell_contact_embedding(
     **kwargs
 ) -> Optional[plt.Axes]:
     """
-    Plots the results of :func:`~monkeybread.calc.cell_contact`, showing spatial positions of cells
+    Plots the results of :func:`monkeybread.calc.cell_contact`, showing spatial positions of cells
     in contact.
 
     Parameters
@@ -24,7 +24,7 @@ def cell_contact_embedding(
     adata
         Annotated data matrix.
     contacts
-        The actual cell contacts, as calculated by `monkeybread.calc.cell_contact`.
+        The actual cell contacts, as calculated by :func:`monkeybread.calc.cell_contact`.
     basis
         Grouping in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     show
@@ -32,7 +32,7 @@ def cell_contact_embedding(
     ax
         An Axes object to add the plots to.
     kwargs
-        Keyword arguments that will be passed to `scanpy.pl.embedding`.
+        Keyword arguments that will be passed to :func:`scanpy.pl.embedding`.
 
     Returns
     -------
@@ -79,8 +79,8 @@ def cell_contact_histplot(
     **kwargs
 ) -> Optional[plt.Axes]:
     """
-    Plots the results of :func:`~monkeybread.calc.cell_contact` and
-    :func:`~monkeybread.stat.cell_contact`.
+    Plots the results of :func:`monkeybread.calc.cell_contact` and
+    :func:`monkeybread.stat.cell_contact`.
 
     Creates a histogram displaying the distribution of contacts from the permutation test with a
     line indicating the actual distribution of contact counts.
@@ -88,9 +88,9 @@ def cell_contact_histplot(
     Parameters
     ----------
     contacts
-        The actual cell contacts, as calculated by `monkeybread.calc.cell_contact`.
+        The actual cell contacts, as calculated by :func:`monkeybread.calc.cell_contact`.
     expected_contacts
-        The expected cell contacts, as calculated by `monkeybread.stat.cell_contact`.
+        The expected cell contacts, as calculated by :func:`monkeybread.stat.cell_contact`.
     show
         Whether to show the plot or return the Axes object.
     ax
@@ -129,8 +129,8 @@ def cell_contact_heatmap(
     **kwargs
 ) -> Optional[plt.Axes]:
     """
-    Plots the results of :func:`~monkeybread.calc.cell_contact` and optionally
-    :func:`~monkeybread.stat.cell_contact`.
+    Plots the results of :func:`monkeybread.calc.cell_contact` and optionally
+    :func:`monkeybread.stat.cell_contact`.
 
     Produces a heatmap where rows correspond to `group1` and columns correspond to `group2`.
     An entry in the heatmap depicts either the raw contact frequencies or the p-values for those
@@ -144,9 +144,9 @@ def cell_contact_heatmap(
     groupby
         A column in `adata.obs` to group cells by.
     contacts
-        The actual cell contacts, as calculated by `monkeybread.calc.cell_contact`.
+        The actual cell contacts, as calculated by :func:`monkeybread.calc.cell_contact`.
     expected_contacts
-        The expected cell contacts, as calculated by `monkeybread.stat.cell_contact`.
+        The expected cell contacts, as calculated by :func:`monkeybread.stat.cell_contact`.
     count_multi
         Count each contact when making calculations. E.g., if a cell A is contacting two cells B and
         C, if both B and C are cell type X, count as 2 contacts instead of 1.

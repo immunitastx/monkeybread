@@ -24,7 +24,7 @@ def cell_transcript_proximity(
     cells
         A list of cell ids to plot.
     transcripts
-        Transcripts to plot, as calculated by :func:`~monkeybread.calc.cell_transcript_proximity`.
+        Transcripts to plot, as calculated by :func:`monkeybread.calc.cell_transcript_proximity`.
     label
         A column in `adata` to use to color cells.
     label_transcripts
@@ -35,7 +35,7 @@ def cell_transcript_proximity(
     ax
         An axis object to use, only used if `pairwise = False`.
     kwargs
-        Keyword arguments passed to :func:`~seaborn.scatterplot` for transcripts.
+        Keyword arguments passed to :func:`seaborn.scatterplot` for transcripts.
 
     Returns
     -------

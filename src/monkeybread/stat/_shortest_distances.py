@@ -18,7 +18,7 @@ def shortest_distances(
     """Calculates an expected distribution of shortest distances via permutation of labels excluding
     `group2`.
 
-    Calculation is the same as in :func:`~monkeybread.calc.shortest_distances`.
+    Calculation is the same as in :func:`monkeybread.calc.shortest_distances`.
 
     If `actual` and `threshold` are provided, a p-value relating the proportion of distances under
     `threshold` in the actual data compared to the expected data is produced.
@@ -37,7 +37,7 @@ def shortest_distances(
         The number of permutations to run. Defaults to 100.
     actual
         The actual distribution of shortest distances, as calculated by
-        `monkeybread.calc.shortest_distances`.
+        :func:`monkeybread.calc.shortest_distances`.
     threshold
         A distance threshold to use for significance calculation, in coordinate units.
 

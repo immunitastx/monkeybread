@@ -16,14 +16,14 @@ def volcano_plot(
     filter_kwargs: Optional[dict] = {},
     **kwargs
 ) -> Optional[plt.Axes]:
-    """Plots the results of :func:`~scanpy.tl.rank_genes_groups` in the form of a volcano plot.
+    """Plots the results of :func:`scanpy.tl.rank_genes_groups` in the form of a volcano plot.
 
     Parameters
     ----------
     adata
         Annotated data matrix.
     group
-        Which group (as in :func:`~scanpy.tl.rank_genes_groups`’s groupby argument) to return
+        Which group (as in :func:`scanpy.tl.rank_genes_groups`’s groupby argument) to return
         results from. Can be a list. All groups are returned if `groups` is None.
     key
         Key differential expression groups were stored under.
@@ -34,9 +34,9 @@ def volcano_plot(
     show
         Whether to show the plot or return it
     filter_kwargs
-        Keyword arguments to pass into :func:`~scanpy.get.rank_genes_groups_df`.
+        Keyword arguments to pass into :func:`scanpy.get.rank_genes_groups_df`.
     kwargs
-        Keyword arguments to pass into :func:`~seaborn.scatterplot`.
+        Keyword arguments to pass into :func:`seaborn.scatterplot`.
 
     Returns
     -------
