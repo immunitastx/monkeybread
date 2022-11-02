@@ -14,7 +14,7 @@ def kernel_density(
     title: Optional[str] = None,
     ax: Optional[plt.Axes] = None
 ) -> Optional[Union[plt.Figure, plt.Axes]]:
-    """Plots the results of :func:`~monkeybread.calc.kernel_density` using :func:`~scanpy.pl.embedding`.
+    """Plots the results of :func:`monkeybread.calc.kernel_density` using :func:`scanpy.pl.embedding`.
 
     Parameters
     ----------
