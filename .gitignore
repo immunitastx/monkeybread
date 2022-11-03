@@ -13,7 +13,7 @@ __pycache__/
 # Tests and coverage
 /.pytest_cache/
 /.cache/
-/data/
+**/data/
 
 # docs
 /docs/generated/

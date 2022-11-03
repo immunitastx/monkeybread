@@ -43,9 +43,8 @@ def kernel_density(
     Returns
     -------
     densities
-        If `return_densities = False`, nothing is returned. Otherwise, if `separate_groups = True`,
-        a dictionary mapping groups to keys in `adata.obs` is returned. If
-        `separate_groups = False`, a single key in `adata.obs` is returned.
+        If `separate_groups = True`,  a dictionary mapping groups to keys in `adata.obs` is
+        returned. If `separate_groups = False`, a single key in `adata.obs` is returned.
     """
     # Convert group into a list of values in adata.obs[groupby]
     if groupby != "all" and (type(group) == str or group is None):
