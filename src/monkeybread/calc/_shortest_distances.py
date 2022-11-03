@@ -38,11 +38,11 @@ def shortest_distances(
     group2_cells = adata[[g in group2 for g in adata.obs[groupby]]].copy()
     nbrs = NearestNeighbors(n_neighbors = 1).fit(group2_cells.obsm["X_spatial"])
     distances, indices = nbrs.kneighbors(group1_cells.obsm["X_spatial"])
-    group2_indices = group2_cells.obs.index[indices.transpose()[0]]
-    return np.array(
+    group2_indices = group2_cells.obs.index[indices.transpose()[0]].to_numpy()
+    return np.array(list(
         zip(
             group1_cells.obs.index,
             distances.transpose()[0],
             group2_indices
         )
-    )
+    ))

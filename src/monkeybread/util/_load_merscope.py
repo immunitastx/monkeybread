@@ -70,7 +70,7 @@ def load_merscope(
         data.obsm["X_spatial"] = coordinates[["center_x", "center_y"]].to_numpy()
         data.obs["width"] = coordinates["max_x"].to_numpy() - coordinates["min_x"].to_numpy()
         data.obs["height"] = coordinates["max_y"].to_numpy() - coordinates["min_y"].to_numpy()
-        data.obs["fov"] = coordinates["fov"]
+        data.obs["fov"] = coordinates["fov"].to_numpy()
     if cell_bounds or (cell_bounds is None and
                        os.path.exists(f"{folder}/{paths['cell_bounds']}")):
         data.obs["bounds"] = np.array(data.obs.shape[0])
