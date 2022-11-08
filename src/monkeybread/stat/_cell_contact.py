@@ -64,11 +64,13 @@ def cell_contact(
 
     # Pull out cells corresponding to both groups
     group_cells = adata[[g in group1 or g in group2 for g in adata.obs[groupby]]].copy()
+    g1_index = adata[[g in group1 for g in adata.obs[groupby]]].obs.index
+    g2_index = adata[[g in group2 for g in adata.obs[groupby]]].obs.index
 
     # Sums the number of unique contacts given the contact dictionary and ids corresponding to cells
     # that count for each group
     contact_count = lambda contacts, g1, g2: sum(len(v) for v in contacts.values()) - \
-        int(0.5 * sum(0 if k not in g2 else sum(v in g2 for v in values) for
+        int(0.5 * sum(0 if k not in g2 else sum(v in g1 for v in values) for
             k, values in contacts.items()))
 
     # Runs through position permutations
@@ -93,8 +95,7 @@ def cell_contact(
             for (g1, g2) in itertools.product(group1, group2):
                 perm_contact[g1][g2][i] = touches_dict[g1][g2]
         else:
-            perm_contact[i] = contact_count(perm_i_contact, group_cells.obs.index,
-                                            group_cells.obs.index)
+            perm_contact[i] = contact_count(perm_i_contact, g1_index, g2_index)
 
     # Calculate p_values
     if split_groups:
@@ -113,6 +114,6 @@ def cell_contact(
         }
         return pd.DataFrame(p_values)
     else:
-        actual_count = contact_count(actual_contact, group_cells.obs.index, group_cells.obs.index)
+        actual_count = contact_count(actual_contact, g1_index, g2_index)
         p_val = (np.sum(np.where(perm_contact >= actual_count, 1, 0)) + 1) / (n_perms + 1)
         return perm_contact, p_val

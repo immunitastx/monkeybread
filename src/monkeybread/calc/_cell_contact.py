@@ -43,8 +43,8 @@ def cell_contact(
         group1 = [group1]
     if type(group2) == str:
         group2 = [group2]
-    group1_cells = adata[[g in group1 for g in adata.obs[groupby]]].copy()
-    group2_cells = adata[[g in group2 for g in adata.obs[groupby]]].copy()
+    group1_cells = adata[[g in group1 for g in adata.obs[groupby]]]
+    group2_cells = adata[[g in group2 for g in adata.obs[groupby]]]
     obsm_key = f"X_{basis}"
     if radius is None:
         radius = np.mean([np.mean([np.mean(group1_cells.obs["height"]),

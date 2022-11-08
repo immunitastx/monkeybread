@@ -25,10 +25,10 @@ def cell_transcript_proximity(
     filtered_transcripts
         Transcripts in proximity to the list of cells provided, with a column for gene, x, and y.
     """
-    cell_bounds = adata.obs["bounds"][cells]
+    cell_bounds = adata.obs["bounds"][cells].apply(np.transpose)
     transcripts = adata.uns["transcripts"]
-    mins = np.min(np.hstack(*cell_bounds), axis = 1)
-    maxes = np.max(np.hstack(*cell_bounds), axis = 1)
+    mins = np.min(np.hstack(cell_bounds), axis = 1)
+    maxes = np.max(np.hstack(cell_bounds), axis = 1)
     transcript_locations = transcripts[['gene', 'global_x', 'global_y']]
     transcript_locations.rename({"global_x": "x", "global_y": "y"}, axis = 1, inplace = True)
     if genes is not None:
