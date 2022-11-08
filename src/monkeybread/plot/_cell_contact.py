@@ -12,7 +12,7 @@ def cell_contact_embedding(
     contacts: Dict[str, Set[str]],
     group: Optional[str] = None,
     basis: Optional[str] = "spatial",
-    show: Optional[bool] = False,
+    show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
     **kwargs
 ) -> Optional[plt.Axes]:
@@ -80,7 +80,7 @@ def cell_contact_histplot(
     groupby: str,
     contacts: Dict[str, Set[str]],
     expected_contacts: Tuple[np.ndarray, float],
-    show: Optional[bool] = False,
+    show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
     **kwargs
 ) -> Optional[plt.Axes]:
@@ -142,7 +142,7 @@ def cell_contact_heatmap(
     contacts: Dict[str, Set[str]],
     expected_contacts: Optional[pd.DataFrame] = None,
     count_multi: Optional[bool] = False,
-    show: Optional[bool] = False,
+    show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
     **kwargs
 ) -> Optional[plt.Axes]:

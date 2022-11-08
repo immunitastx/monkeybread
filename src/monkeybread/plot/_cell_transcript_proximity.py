@@ -12,9 +12,10 @@ def cell_transcript_proximity(
     label: Optional[str] = None,
     legend: Optional[bool] = False,
     pairwise: Optional[bool] = False,
+    show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
     **kwargs
-) -> Union[plt.Axes, plt.Figure]:
+) -> Optional[Union[plt.Axes, plt.Figure]]:
     """Plots cell boundaries and optionally transcripts in the surrounding area.
 
     Parameters
@@ -32,6 +33,8 @@ def cell_transcript_proximity(
     pairwise
         Whether to draw a matrix of subplots [i, j] where the plot at [i, j] contains only the genes
         demarcated by the row and column. Allows for more fine-tuned observation of specific genes.
+    show
+        Whether to show the plot or return the Axes object.
     ax
         An axis object to use, only used if `pairwise = False`.
     kwargs
@@ -41,7 +44,7 @@ def cell_transcript_proximity(
     -------
     ax
         A matplotlib Axes containing the plot if `pairwise = False`, otherwise a matplotlib Figure
-        containing all of the subplots.
+        containing all of the subplots. Only returned if `show = False`.
     """
     if pairwise:
         if transcripts is None:
@@ -75,7 +78,10 @@ def cell_transcript_proximity(
             legend_ax.legend(by_label.values(), by_label.keys(),
                              loc = 'center left', bbox_to_anchor = (1, 0.5))
         plt.subplots_adjust(wspace = 0.1, hspace = 0.1)
-        return fig
+        if show:
+            plt.show()
+        else:
+            return fig
     else:
         cell_bounds = adata[cells].obs["bounds"]
         ax = plt.axes() if ax is None else ax
@@ -100,4 +106,7 @@ def cell_transcript_proximity(
             )
         if legend:
             ax.legend(loc = 'center left', bbox_to_anchor = (1, 0.5))
-        return ax
+        if show:
+            plt.show()
+        else:
+            return ax
