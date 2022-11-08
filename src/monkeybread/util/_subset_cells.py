@@ -56,16 +56,21 @@ def subset_cells(
         elif by == "gene":
             mask = [cases[relation](count, value) for count in adata.transpose()[obs].X[0]]
     elif type(subset) is list:
-        mask = [True] * adata.shape[0]
+        mask = np.full(adata.shape[0], fill_value = True)
         for (obs, relation, value) in subset:
             if relation not in cases:
                 raise ValueError("Relation not one of 'gt', 'gte', 'lt', 'lte', 'eq'.")
             if by == "spatial":
-                mask = [curr and cases[relation](count, value) for (curr, count) in
-                        zip(mask, adata.obsm["X_spatial"].transpose()[1 if obs == "y" else 0])]
+                mask = np.logical_and(
+                    mask,
+                    [cases[relation](count, value) for count in
+                     adata.obsm["X_spatial"].transpose()[1 if obs == "y" else 0]]
+                )
             elif by == "gene":
-                mask = [curr and cases[relation](count, value) for (curr, count) in
-                        zip(mask, adata.transpose()[obs].X[0])]
+                mask = np.logical_and(
+                    mask,
+                    [cases[relation](count, value) for count in adata.transpose()[obs].X[0]]
+                )
     else:
         raise TypeError("Positional argument `subset` must be a tuple or list.")
     if label_obs is not None and label is not None:
