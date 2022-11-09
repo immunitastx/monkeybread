@@ -64,7 +64,8 @@ def cell_transcript_proximity(
                     ax = axs[i, j],
                     s = 10,
                     label = label,
-                    hue_order = [marker1, marker2]
+                    hue_order = [marker1, marker2],
+                    show = False
                 )
                 axs[i, j].set_title(marker2 if i == 0 else None)
                 axs[i, j].set_ylabel(marker1 if j == 0 else None)

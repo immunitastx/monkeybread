@@ -1,3 +1,4 @@
+import itertools
 from anndata import AnnData
 from typing import Union, Set, Dict, Optional, Tuple
 import numpy as np
@@ -5,6 +6,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import scanpy as sc
 import pandas as pd
+import monkeybread as mb
 
 
 def cell_contact_embedding(
@@ -122,9 +124,7 @@ def cell_contact_histplot(
     g2_cats = set(adata[[v for vals in contacts.values() for v in vals]].obs[groupby])
     g1 = adata[[g in g1_cats for g in adata.obs[groupby]]].obs.index
     g2 = adata[[g in g2_cats for g in adata.obs[groupby]]].obs.index
-    num_contacts = sum(len(v) for v in contacts.values()) - \
-        int(0.5 * sum(0 if k not in g2 else sum(v in g1 for v in values)
-            for k, values in contacts.items()))
+    num_contacts = mb.util.contact_count(contacts, g1, g2)
 
     sns.histplot(expected_contacts, ax = ax, **kwargs)
     ax.axvline(num_contacts, 0, 1, color = "red", linestyle = '--')
@@ -188,11 +188,19 @@ def cell_contact_heatmap(
     contacting_counts = {
         g1: {g2: 0 for g2 in group2} for g1 in group1
     }
-    for g1, g2s in contacts.items():
-        g1_type = adata.obs[groupby][g1]
-        g2_types = [adata.obs[groupby][t] for t in g2s]
-        for g2_type in (g2_types if count_multi else set(g2_types)):
-            contacting_counts[g1_type][g2_type] += 1
+    if count_multi:
+        for g1, g2s in contacts.items():
+            g1_type = adata.obs[groupby][g1]
+            g2_types = [adata.obs[groupby][t] for t in g2s]
+            for g2_type in set(g2_types):
+                contacting_counts[g1_type][g2_type] += 1
+    else:
+        for g1, g2 in itertools.product(group1, group2):
+            contacting_counts[g1][g2] = mb.util.contact_count(
+                contacts,
+                adata[adata.obs[groupby] == g1].obs.index,
+                adata[adata.obs[groupby] == g2].obs.index
+            )
     contact_df = pd.DataFrame(contacting_counts)
     contact_df.fillna(0, inplace = True)
 

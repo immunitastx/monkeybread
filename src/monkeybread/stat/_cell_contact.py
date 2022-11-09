@@ -67,12 +67,6 @@ def cell_contact(
     g1_index = adata[[g in group1 for g in adata.obs[groupby]]].obs.index
     g2_index = adata[[g in group2 for g in adata.obs[groupby]]].obs.index
 
-    # Sums the number of unique contacts given the contact dictionary and ids corresponding to cells
-    # that count for each group
-    contact_count = lambda contacts, g1, g2: sum(len(v) for v in contacts.values()) - \
-        int(0.5 * sum(0 if k not in g2 else sum(v in g1 for v in values) for
-            k, values in contacts.items()))
-
     # Runs through position permutations
     if split_groups:
         perm_contact = {g1: {g2: np.zeros(n_perms) for g2 in group2} for g1 in group1}
@@ -86,7 +80,7 @@ def cell_contact(
             # Splits groups into pairwise comparisons
             # Preferred over recursion to minimize randomization of positions
             touches_dict = {
-                g1: {g2: contact_count(perm_i_contact,
+                g1: {g2: mb.util.contact_count(perm_i_contact,
                                        group_cells[group_cells.obs[groupby] == g1].obs.index,
                                        group_cells[group_cells.obs[groupby] == g2].obs.index)
                      for g2 in group2}
@@ -95,12 +89,12 @@ def cell_contact(
             for (g1, g2) in itertools.product(group1, group2):
                 perm_contact[g1][g2][i] = touches_dict[g1][g2]
         else:
-            perm_contact[i] = contact_count(perm_i_contact, g1_index, g2_index)
+            perm_contact[i] = mb.util.contact_count(perm_i_contact, g1_index, g2_index)
 
     # Calculate p_values
     if split_groups:
         actual_count = {
-            g1: {g2: contact_count(actual_contact,
+            g1: {g2: mb.util.contact_count(actual_contact,
                                    group_cells[group_cells.obs[groupby] == g1].obs.index,
                                    group_cells[group_cells.obs[groupby] == g2].obs.index)
                  for g2 in group2}
@@ -114,6 +108,6 @@ def cell_contact(
         }
         return pd.DataFrame(p_values)
     else:
-        actual_count = contact_count(actual_contact, g1_index, g2_index)
+        actual_count = mb.util.contact_count(actual_contact, g1_index, g2_index)
         p_val = (np.sum(np.where(perm_contact >= actual_count, 1, 0)) + 1) / (n_perms + 1)
         return perm_contact, p_val

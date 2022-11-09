@@ -64,4 +64,5 @@ import monkeybread as mb
     util.load_merscope
     util.randomize_positions
     util.subset_cells
+    util.contact_count
 ```

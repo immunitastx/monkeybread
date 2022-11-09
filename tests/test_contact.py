@@ -14,10 +14,33 @@ def assert_unique_contact(adata, group1, group2, expected_num, radius = None, **
     g2 = adata[[c in group2 for c in adata.obs["cell_type"]]].obs.index
     observed_contact = mb.calc.cell_contact(adata, "cell_type", group1, group2,
                                             radius = radius, **kwargs)
-    observed_num = sum(len(v) for v in observed_contact.values()) - \
-        int(0.5 * sum(0 if k not in g2 else sum(v in g1 for v in values) for
-            k, values in observed_contact.items()))
+    observed_num = mb.util.contact_count(observed_contact, g1, g2)
     assert observed_num == expected_num
+
+
+def test_contact_count():
+    d1 = {
+        1: {2},
+        2: {1, 3},
+        3: {2}
+    }
+    assert mb.util.contact_count(d1, [1, 2], [2, 3]) == 2
+    d2 = {
+        1: {2},
+        2: {1, 3},
+        3: {2}
+    }
+    assert mb.util.contact_count(d2, [1], [3]) == 0
+    d3 = {
+        1: {2, 3, 4},
+        2: {1, 4, 5},
+        3: {1, 4, 6},
+        4: {1, 2, 3, 5, 6},
+        5: {2, 4, 6},
+        6: {3, 4, 5, 7, 8},
+        7: {6, 8}
+    }
+    assert mb.util.contact_count(d3, [1, 2, 3, 4, 5, 6, 7], [1, 2, 3, 4, 5, 6, 8]) == 13
 
 
 def test_dense_contact_radius_0(dense_sample):
