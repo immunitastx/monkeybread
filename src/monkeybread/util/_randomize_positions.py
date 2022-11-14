@@ -28,10 +28,9 @@ def randomize_positions(
 
     Returns
     -------
-    random_coords
-        If `return_positions = True`, returns a list of the randomized coordinates corresponding to
-        the coordinates in `adata.obsm["X_spatial"]`. Otherwise, these coordinates are assigned to
-        `adata.obsm["X_spatial_random"]`.
+    If `return_positions = True`, returns a list of the randomized coordinates corresponding to
+    the coordinates in `adata.obsm["X_spatial"]`. Otherwise, these coordinates are assigned to
+    `adata.obsm["X_spatial_random"]`.
     """
 
     bar = lambda x: x

@@ -22,8 +22,7 @@ def contact_count(
 
     Returns
     -------
-    total
-        The number of unique contacts found between `group1` and `group2`.
+    The number of unique contacts found between `group1` and `group2`.
     """
     return \
         sum(0 if k not in group1 else sum(v in group2 for v in values)

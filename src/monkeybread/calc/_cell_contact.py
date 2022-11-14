@@ -36,8 +36,7 @@ def cell_contact(
 
     Returns
     -------
-    contacts
-        A mapping from cell ids in `group1` to sets of cell ids in `group2` indicating contact.
+    A mapping from cell ids in `group1` to sets of cell ids in `group2` indicating contact.
     """
     if type(group1) == str:
         group1 = [group1]

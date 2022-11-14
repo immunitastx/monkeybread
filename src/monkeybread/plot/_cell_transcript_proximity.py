@@ -42,9 +42,8 @@ def cell_transcript_proximity(
 
     Returns
     -------
-    ax
-        A matplotlib Axes containing the plot if `pairwise = False`, otherwise a matplotlib Figure
-        containing all of the subplots. Only returned if `show = False`.
+    A matplotlib Axes containing the plot if `pairwise = False`, otherwise a matplotlib Figure
+    containing all of the subplots. Only returned if `show = False`.
     """
     if pairwise:
         if transcripts is None:

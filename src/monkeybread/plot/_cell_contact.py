@@ -41,9 +41,8 @@ def cell_contact_embedding(
 
     Returns
     -------
-    ax
-        If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
-        within.
+    If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
+    within.
     """
     if ax is None:
         ax = plt.axes()
@@ -112,9 +111,8 @@ def cell_contact_histplot(
 
     Returns
     -------
-    ax
-        If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
-        within.
+    If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
+    within.
     """
     if ax is None:
         ax = plt.axes()
@@ -177,9 +175,8 @@ def cell_contact_heatmap(
 
     Returns
     -------
-    ax
-        If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
-        within.
+    If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
+    within.
     """
     if ax is None:
         ax = plt.axes()

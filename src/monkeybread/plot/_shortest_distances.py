@@ -26,9 +26,8 @@ def shortest_distances(
 
     Returns
     -------
-    axes
-        If `show = False`, returns nothing. Otherwise, returns a single Axes object or a tuple of
-        two Axes objects if expected_distances is provided.
+    If `show = False`, returns nothing. Otherwise, returns a single Axes object or a tuple of
+    two Axes objects if expected_distances is provided.
     """
     ax = None
     axs = None

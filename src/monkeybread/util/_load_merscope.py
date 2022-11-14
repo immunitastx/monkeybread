@@ -46,8 +46,7 @@ def load_merscope(
 
     Returns
     -------
-    adata
-        An annotated data matrix containing spatial data from MERSCOPE.
+    An annotated data matrix containing spatial data from MERSCOPE.
     """
     if paths is None:
         paths = {}

@@ -47,14 +47,11 @@ def cell_contact(
 
     Returns
     -------
-    perm_contact
-        An array containing the number of contacts observed for each permutation.
-    p_val
-        A p_value comparing the expected contact to the actual contact.
-    dataframe
-        If `split_groups = True`, a dataframe will be provided where each cell contains
-        `perm_contact` and `p_val` for that combination of `group1` (columns) and
-        `group2` (rows).
+    If `split_groups = False`, a length-two tuple will be returned. The first element is an array
+    containing the number of contacts observed for each permutation. The second element is a p_value
+    comparing the expected contact to the actual contact. If `split_groups = True`, a dataframe will
+    be provided where each cell contains `p_val` for that combination of `group1` (columns) and
+    `group2` (rows).
     """
     # Convert string groups to lists
     if type(group1) == str:

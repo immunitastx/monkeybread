@@ -22,8 +22,7 @@ def cell_transcript_proximity(
 
     Returns
     -------
-    filtered_transcripts
-        Transcripts in proximity to the list of cells provided, with a column for gene, x, and y.
+    Transcripts in proximity to the list of cells provided, with a column for gene, x, and y.
     """
     cell_bounds = adata.obs["bounds"][cells].apply(np.transpose)
     transcripts = adata.uns["transcripts"]

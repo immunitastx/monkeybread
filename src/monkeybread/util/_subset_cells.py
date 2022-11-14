@@ -41,8 +41,7 @@ def subset_cells(
 
     Returns
     -------
-    adata_subset
-        A copy of `adata` containing only cells matching the subset conditions.
+    A copy of `adata` containing only cells matching the subset conditions.
     """
     if by != "spatial" and by != "gene":
         raise ValueError(f"Argument `by` must be one of 'gene' or 'spatial'. Value provided: {by}")

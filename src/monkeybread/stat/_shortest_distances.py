@@ -43,12 +43,10 @@ def shortest_distances(
 
     Returns
     -------
-    expected
-        An expected distribution as described above.
-    threshold
-        Optionally, the threshold passed in corresponding to the p-value.
-    p_val
-        Optionally, a p-value as described above.
+    If `threshold` is not provided, an array containing the expected distribution as described
+    above. If `threshold` is provided, a length-3 tuple will be returned, where the first element
+    is the array containing the expected distribution. The second element corresponds to the
+    threshold, and the third element is the p-value calculated.
     """
     p_statistic = lambda x: np.count_nonzero(np.less(x, threshold))
     if type(group1) == str:
