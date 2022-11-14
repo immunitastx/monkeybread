@@ -12,7 +12,7 @@ def kernel_density(
     groupname: Optional[str] = None,
     bandwidth: Optional[float] = 1.0,
     resolution: Optional[float] = 1.0,
-    separate_groups = False
+    separate_groups = False,
 ) -> Union[str, Dict[str, str]]:
     """Calculates kernel density estimation on large cell quantities.
 
@@ -42,9 +42,8 @@ def kernel_density(
 
     Returns
     -------
-    densities
-        If `separate_groups = True`,  a dictionary mapping groups to keys in `adata.obs` is
-        returned. If `separate_groups = False`, a single key in `adata.obs` is returned.
+    If `separate_groups = True`,  a dictionary mapping groups to keys in `adata.obs` is
+    returned. If `separate_groups = False`, a single key in `adata.obs` is returned.
     """
     # Convert group into a list of values in adata.obs[groupby]
     if groupby != "all" and (type(group) == str or group is None):
@@ -97,14 +96,13 @@ def kernel_density(
             cell_group: np.matmul(kernel, value) / num_bins for (cell_group, value) in
             kernel_counts.items()
         }
-        min_density = min(min(densities) for densities in kernel_densities.values())
-        max_density = max(max(densities) for densities in kernel_densities.values())
-        if min_density != max_density:
-            kernel_densities = {
-                cell_group: [(d - min_density) / (max_density - min_density) for d in
-                             kernel_densities[cell_group]]
-                for (cell_group, value) in kernel_densities.items()
-            }
+        mins = [min(densities) for densities in kernel_densities.values()]
+        maxes = [max(densities) for densities in kernel_densities.values()]
+        kernel_densities = {
+            cell_group: [(d - min) / (max - min) for d in
+                         kernel_densities[cell_group]]
+            for min, max, (cell_group, value) in zip(mins, maxes, kernel_densities.items())
+        }
     else:
         kernel_densities = np.matmul(kernel, kernel_counts) / num_bins
         min_density, max_density = min(kernel_densities), max(kernel_densities)
