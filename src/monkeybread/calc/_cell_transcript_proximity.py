@@ -22,19 +22,19 @@ def cell_transcript_proximity(
 
     Returns
     -------
-    filtered_transcripts
-        Transcripts in proximity to the list of cells provided, with a column for gene, x, and y.
+    Transcripts in proximity to the list of cells provided, with a column for gene, x, and y.
     """
-    cell_bounds = adata.obs["bounds"][cells]
+    cell_bounds = adata.obs["bounds"][cells].apply(np.transpose)
     transcripts = adata.uns["transcripts"]
-    mins = np.min(np.hstack(*cell_bounds), axis = 1)
-    maxes = np.max(np.hstack(*cell_bounds), axis = 1)
+    mins = np.min(np.hstack(cell_bounds), axis = 1)
+    maxes = np.max(np.hstack(cell_bounds), axis = 1)
     transcript_locations = transcripts[['gene', 'global_x', 'global_y']]
-    transcript_locations.rename({"global_x": "x", "global_y": "y"}, axis = 1, inplace = True)
     if genes is not None:
         transcript_locations = transcript_locations.loc[transcript_locations['gene'].isin(genes), :]
-    transcript_locations = transcript_locations.loc[[
-        mins[0] <= x <= maxes[0] and
-        mins[1] <= y <= maxes[1]
-        for i, (g, x, y) in transcript_locations.iterrows()], :]
+    transcript_locations = transcript_locations[
+        (mins[0] <= transcript_locations["global_x"]) &
+        (maxes[0] >= transcript_locations["global_x"]) &
+        (mins[1] <= transcript_locations["global_y"]) &
+        (maxes[1] >= transcript_locations["global_y"])
+    ]
     return transcript_locations

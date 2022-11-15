@@ -1,3 +1,4 @@
+import itertools
 from anndata import AnnData
 from typing import Union, Set, Dict, Optional, Tuple
 import numpy as np
@@ -5,13 +6,15 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import scanpy as sc
 import pandas as pd
+import monkeybread as mb
 
 
 def cell_contact_embedding(
     adata: AnnData,
     contacts: Dict[str, Set[str]],
+    group: Optional[str] = None,
     basis: Optional[str] = "spatial",
-    show: Optional[bool] = False,
+    show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
     **kwargs
 ) -> Optional[plt.Axes]:
@@ -25,6 +28,8 @@ def cell_contact_embedding(
         Annotated data matrix.
     contacts
         The actual cell contacts, as calculated by :func:`monkeybread.calc.cell_contact`.
+    group
+        Column in `adata.obs` to label cell contacts by.
     basis
         Grouping in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     show
@@ -36,15 +41,14 @@ def cell_contact_embedding(
 
     Returns
     -------
-    ax
-        If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
-        within.
+    If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
+    within.
     """
     if ax is None:
         ax = plt.axes()
     cell_list = set(contacts.keys())
     for s in contacts.values():
-        cell_list.union(s)
+        cell_list = cell_list.union(s)
     adata_contact = adata[list(cell_list)].copy()
     sc.pl.embedding(
         adata,
@@ -61,6 +65,7 @@ def cell_contact_embedding(
         basis = basis,
         show = False,
         ax = ax,
+        color = group,
         na_color = "red",
         size = (12000 / adata.shape[0]) * 5,
         **kwargs
@@ -72,9 +77,11 @@ def cell_contact_embedding(
 
 
 def cell_contact_histplot(
+    adata: AnnData,
+    groupby: str,
     contacts: Dict[str, Set[str]],
     expected_contacts: Tuple[np.ndarray, float],
-    show: Optional[bool] = False,
+    show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
     **kwargs
 ) -> Optional[plt.Axes]:
@@ -87,6 +94,10 @@ def cell_contact_histplot(
 
     Parameters
     ----------
+    adata
+        Annotated data matrix.
+    groupby
+        A column in `adata.obs` to group cells by.
     contacts
         The actual cell contacts, as calculated by :func:`monkeybread.calc.cell_contact`.
     expected_contacts
@@ -100,14 +111,19 @@ def cell_contact_histplot(
 
     Returns
     -------
-    ax
-        If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
-        within.
+    If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
+    within.
     """
     if ax is None:
         ax = plt.axes()
     expected_contacts, p_val = expected_contacts
-    num_contacts = sum([len(v) for v in contacts.values()])
+
+    g1_cats = set(adata[list(contacts.keys())].obs[groupby])
+    g2_cats = set(adata[[v for vals in contacts.values() for v in vals]].obs[groupby])
+    g1 = adata[[g in g1_cats for g in adata.obs[groupby]]].obs.index
+    g2 = adata[[g in g2_cats for g in adata.obs[groupby]]].obs.index
+    num_contacts = mb.util.contact_count(contacts, g1, g2)
+
     sns.histplot(expected_contacts, ax = ax, **kwargs)
     ax.axvline(num_contacts, 0, 1, color = "red", linestyle = '--')
     plt.text(0.98, 0.98, f"p = {p_val : .2f}",
@@ -124,7 +140,7 @@ def cell_contact_heatmap(
     contacts: Dict[str, Set[str]],
     expected_contacts: Optional[pd.DataFrame] = None,
     count_multi: Optional[bool] = False,
-    show: Optional[bool] = False,
+    show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
     **kwargs
 ) -> Optional[plt.Axes]:
@@ -159,9 +175,8 @@ def cell_contact_heatmap(
 
     Returns
     -------
-    ax
-        If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
-        within.
+    If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
+    within.
     """
     if ax is None:
         ax = plt.axes()
@@ -170,11 +185,19 @@ def cell_contact_heatmap(
     contacting_counts = {
         g1: {g2: 0 for g2 in group2} for g1 in group1
     }
-    for g1, g2s in contacts.items():
-        g1_type = adata.obs[groupby][g1]
-        g2_types = [adata.obs[groupby][t] for t in g2s]
-        for g2_type in (g2_types if count_multi else set(g2_types)):
-            contacting_counts[g1_type][g2_type] += 1
+    if count_multi:
+        for g1, g2s in contacts.items():
+            g1_type = adata.obs[groupby][g1]
+            g2_types = [adata.obs[groupby][t] for t in g2s]
+            for g2_type in set(g2_types):
+                contacting_counts[g1_type][g2_type] += 1
+    else:
+        for g1, g2 in itertools.product(group1, group2):
+            contacting_counts[g1][g2] = mb.util.contact_count(
+                contacts,
+                adata[adata.obs[groupby] == g1].obs.index,
+                adata[adata.obs[groupby] == g2].obs.index
+            )
     contact_df = pd.DataFrame(contacting_counts)
     contact_df.fillna(0, inplace = True)
 
@@ -182,15 +205,21 @@ def cell_contact_heatmap(
         contact_df_normalized = expected_contacts.T
         contact_df_annot = contact_df_normalized
     else:
-        contact_df_annot = contact_df
+        contact_df_annot = contact_df.T
         contact_df_normalized = contact_df.T.apply(
             lambda arr: arr / (np.sum(arr) if np.sum(arr) > 0 else 1), axis = 1, raw = True
         )
+
+    fmt = ".3f" if expected_contacts is not None else "d"
+    if "fmt" in kwargs:
+        fmt = kwargs["fmt"]
+        del kwargs["fmt"]
 
     sns.heatmap(contact_df_normalized,
                 ax = ax,
                 cmap = f'plasma{"_r" if expected_contacts is not None else ""}',
                 annot = contact_df_annot,
+                fmt = fmt,
                 **kwargs)
     if show:
         plt.show()

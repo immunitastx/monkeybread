@@ -26,13 +26,22 @@ def shortest_distances(
 
     Returns
     -------
-    axes
-        If `show = False`, returns nothing. Otherwise, returns a single Axes object or a tuple of
-        two Axes objects if expected_distances is provided.
+    If `show = False`, returns nothing. Otherwise, returns a single Axes object or a tuple of
+    two Axes objects if expected_distances is provided.
     """
+    ax = None
     axs = None
     if expected_distances is not None:
         fig, axs = plt.subplots(nrows = 1, ncols = 2, figsize = (12, 4))
+        ax = axs[0]
+    ax = sns.histplot(
+        list(map(float, np.transpose(distances)[1])),
+        ax = ax,
+        legend = None,
+        stat = "density",
+        **kwargs
+    )
+    if expected_distances is not None:
         sns.histplot(
             expected_distances[0],
             ax = axs[1],
@@ -53,17 +62,9 @@ def shortest_distances(
                         verticalalignment = "top",
                         transform = axs[0].transAxes
                         )
-            threshold = expected_distances[2]
+            threshold = expected_distances[1]
             axs[0].axvline(threshold, 0, 1.0, color = "red", linestyle = '--')
             axs[1].axvline(threshold, 0, 1.0, color = "red", linestyle = '--')
-    ax = axs[0] if axs is not None else None
-    ax = sns.histplot(
-        np.transpose(distances)[1],
-        ax = ax,
-        legend = None,
-        stat = "density",
-        **kwargs
-    )
     if show:
         plt.show()
     else:

@@ -43,15 +43,15 @@ def kernel_density(
     if type(key) == dict:
         ncols = min(len(key), 4)
         nrows = int(len(key) / ncols) + 1
-        for (index, subgroup) in zip(range(len(key)), key.keys()):
+        for (index, (category, column)) in enumerate(key.items()):
             axs = plt.subplot(nrows, ncols, index + 1)
             kernel_density(
                 adata,
-                key = subgroup,
+                key = column,
                 spot_size = spot_size,
                 cmap = cmap,
                 show = False,
-                title = title,
+                title = category,
                 ax = axs,
             )
         plt.subplots_adjust(
@@ -66,17 +66,18 @@ def kernel_density(
             plt.show()
         else:
             return plt.gcf()
-    axs = sc.pl.embedding(
-        adata,
-        basis = "spatial",
-        color = key,
-        s = spot_size,
-        cmap = cmap,
-        show = show,
-        title = title,
-        ax = ax,
-        vmin = 0.0,
-        vmax = 1.0
-    )
-    if not show:
-        return axs
+    else:
+        axs = sc.pl.embedding(
+            adata,
+            basis = "spatial",
+            color = key,
+            s = spot_size,
+            cmap = cmap,
+            show = show,
+            title = title,
+            ax = ax,
+            vmin = 0.0,
+            vmax = 1.0
+        )
+        if not show:
+            return axs

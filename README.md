@@ -51,6 +51,6 @@ If you found a bug, please use the [issue tracker][issue-tracker].
 
 [scverse-discourse]: https://discourse.scverse.org/
 [issue-tracker]: https://github.com/immunitastx/monkeybread/issues
-[changelog]: https://monkeybread.readthedocs.io/latest/changelog.html
+[changelog]: https://monkeybread.readthedocs.io/en/latest/changelog.html
 [link-docs]: https://monkeybread.readthedocs.io
-[link-api]: https://monkeybread.readthedocs.io/latest/api.html
+[link-api]: https://monkeybread.readthedocs.io/en/latest/api.html

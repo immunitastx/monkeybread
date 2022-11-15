@@ -40,8 +40,7 @@ def volcano_plot(
 
     Returns
     -------
-    plot
-        If `show = False` returns the current axes. If `show = True` returns nothing.
+    If `show = False` returns the current axes. If `show = True` returns nothing.
     """
     de_df = sc.get.rank_genes_groups_df(adata, group = group, key = key, **filter_kwargs)
     logfold = de_df["logfoldchanges"]

@@ -46,8 +46,7 @@ def load_merscope(
 
     Returns
     -------
-    adata
-        An annotated data matrix containing spatial data from MERSCOPE.
+    An annotated data matrix containing spatial data from MERSCOPE.
     """
     if paths is None:
         paths = {}
@@ -70,16 +69,17 @@ def load_merscope(
         data.obsm["X_spatial"] = coordinates[["center_x", "center_y"]].to_numpy()
         data.obs["width"] = coordinates["max_x"].to_numpy() - coordinates["min_x"].to_numpy()
         data.obs["height"] = coordinates["max_y"].to_numpy() - coordinates["min_y"].to_numpy()
+        data.obs["fov"] = coordinates["fov"].to_numpy()
     if cell_bounds or (cell_bounds is None and
                        os.path.exists(f"{folder}/{paths['cell_bounds']}")):
-        data.obs["bounds"] = np.array(data.obs.shape[0])
+        data.obs["bounds"] = np.array(data.obs.shape[0], dtype = object)
         for fov in pd.Categorical(data.obs["fov"]).categories:
             with h5py.File(f"{folder}/{paths['cell_bounds']}/feature_data_{fov}.hdf5",
                            "r") as f:
                 for cell_id in data.obs.index[data.obs["fov"] == fov]:
-                    data.obs["bounds"][cell_id] = f[
+                    data.obs["bounds"][cell_id] = np.array(f[
                         f"featuredata/{cell_id}/zIndex_0/p_0/coordinates"
-                    ][0],
+                    ][0])
     if transcript_locations or (transcript_locations is None and
                                 os.path.exists(f"{folder}/{paths['transcripts']}")):
         data.uns["transcripts"] = pd.read_csv(f"{folder}/{paths['transcripts']}", index_col = 0)

@@ -43,14 +43,12 @@ def shortest_distances(
 
     Returns
     -------
-    expected
-        An expected distribution as described above.
-    threshold
-        Optionally, the threshold passed in corresponding to the p-value.
-    p_val
-        Optionally, a p-value as described above.
+    If `threshold` is not provided, an array containing the expected distribution as described
+    above. If `threshold` is provided, a length-3 tuple will be returned, where the first element
+    is the array containing the expected distribution. The second element corresponds to the
+    threshold, and the third element is the p-value calculated.
     """
-    p_statistic = lambda x: np.count_nonzero(x < threshold)
+    p_statistic = lambda x: np.count_nonzero(np.less(x, threshold))
     if type(group1) == str:
         group1 = [group1]
     if type(group2) == str:
@@ -66,10 +64,11 @@ def shortest_distances(
         nbrs = NearestNeighbors(n_neighbors = 1).fit(random_coords)
         distances, indices = nbrs.kneighbors(group1_data)
         all_distances.extend(distances.transpose()[0])
-        statistics[i] = p_statistic(distances.transpose()[0])
+        if threshold is not None:
+            statistics[i] = p_statistic(distances.transpose()[0])
     all_distances = np.array(all_distances)
-    if actual is None:
+    if actual is None or threshold is None:
         return all_distances
-    actual_statistic = p_statistic(actual)
+    actual_statistic = p_statistic(np.vectorize(np.float)(actual))
     p_val = np.mean([1 if statistic > actual_statistic else 0 for statistic in statistics])
     return all_distances, threshold, p_val
