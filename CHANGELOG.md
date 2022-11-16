@@ -8,12 +8,12 @@ and this project adheres to [Semantic Versioning][].
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
-## [Unreleased]
+## [0.4.0]
 
 ### Added
 
 - This changelog
-- Neighborhood profile functions
+- Neighborhood profile function
 
 ## [0.3.4] - 2022-11-14
 
