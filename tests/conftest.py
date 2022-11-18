@@ -28,7 +28,7 @@ def create_sample(data: Dict[str, List[List[float]]], dims: Optional[Tuple[float
 @pytest.fixture(scope = "module")
 def dense_sample():
     return create_sample({
-        "DC": [
+        "ct1": [
             [2, 2],
             [2.5, 6.5],
             [3, 6],
@@ -36,7 +36,7 @@ def dense_sample():
             [5, 8],
             [7, 5],
         ],
-        "T": [
+        "ct2": [
             [3, 4],
             [3, 5],
             [4, 4],
@@ -54,11 +54,11 @@ def dense_sample():
 @pytest.fixture(scope = "module")
 def sparse_sample():
     return create_sample({
-        "DC": [
+        "ct1": [
             [1, 8],
             [6, 1]
         ],
-        "T": [
+        "ct2": [
             [1, 5],
             [2, 7],
             [2, 8],
