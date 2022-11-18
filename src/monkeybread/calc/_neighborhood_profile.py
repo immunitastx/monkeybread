@@ -30,11 +30,11 @@ def neighborhood_profile(
     basis
         A key in `adata.obsm` to use for cell coordinates.
     neighborhood_groups
-        A list of groups from `adata.obs[groupby]` to consider in the neighborhood profile
-        calculations. If not provided, all groups will be used.
+        A list of groups from `adata.obs[groupby]` to include in the resulting `adata.var_names`.
+        Will not affect the calculations themselves, only which results are provided.
     subset_groups
-        A list of groups in `adata.obs[groupby]` to restrict the resulting AnnData object to. If not
-        provided, all cells will be included.
+        A list of groups in `adata.obs[groupby]` to restrict the resulting AnnData object to. Only
+        cells in those groups will be included in the resulting `adata.obs_names`.
     radius
         Radius in coordinate space to include nearby cells for neighborhood profile calculation.
     normalize_counts
@@ -47,6 +47,8 @@ def neighborhood_profile(
     A new AnnData object where columns now correspond to neighborhood profile proportions. All .obs
     columns will be carried over from the provided AnnData object, and they will share an index.
     """
+    if adata.obs[groupby].dtype != "category":
+        raise ValueError(f"adata.obs['{groupby}'] is not categorical.")
     categories = adata.obs[groupby].cat.categories
     # Calculate all contacts
     contacts = mb.calc.cell_contact(adata, groupby, categories, categories,
@@ -71,9 +73,10 @@ def neighborhood_profile(
     # Create a new AnnData object with cells as rows and group names as columns
     neighbor_adata = AnnData(
         X = adata_neighbors,
-        obs = pd.DataFrame({"n_neighbors": n_neighbors[mask], **adata[mask].obs},
+        obs = pd.DataFrame({"n_neighbors": n_neighbors, groupby: adata[mask].obs[groupby]},
                            index = adata[mask].obs.index),
-        uns = {"neighbor_radius": radius}
+        uns = {"neighbor_radius": radius},
+        dtype = adata_neighbors.to_numpy().dtype
     )
     if neighborhood_groups is not None:
         return neighbor_adata[:, neighborhood_groups].copy()
