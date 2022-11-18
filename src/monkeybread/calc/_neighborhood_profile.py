@@ -76,6 +76,7 @@ def neighborhood_profile(
         obs = pd.DataFrame({"n_neighbors": n_neighbors, groupby: adata[mask].obs[groupby]},
                            index = adata[mask].obs.index),
         uns = {"neighbor_radius": radius},
+        obsm = {f'X_{basis}': adata[mask].obsm[f'X_{basis}'].copy()},
         dtype = adata_neighbors.to_numpy().dtype
     )
     if neighborhood_groups is not None:

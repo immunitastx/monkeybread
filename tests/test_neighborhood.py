@@ -20,6 +20,7 @@ def test_neighborhood_dense_nonnormalized(dense_sample):
         normalize_counts = False
     )
     assert ad_neighborhood.obs["cell_type"].equals(dense_sample.obs["cell_type"])
+    assert np.allclose(ad_neighborhood.obsm["X_spatial"], dense_sample.obsm["X_spatial"])
     assert set(ad_neighborhood.var.index) == set(dense_sample.obs["cell_type"].cat.categories)
     assert ad_neighborhood.obs.index.equals(dense_sample.obs.index)
     assert np.allclose(ad_neighborhood.X, dense_sample_3_radius[["T", "DC"]].to_numpy())
@@ -37,6 +38,7 @@ def test_neighborhood_dense_normalized(dense_sample):
         radius = 3
     )
     assert ad_neighborhood.obs["cell_type"].equals(dense_sample.obs["cell_type"])
+    assert np.allclose(ad_neighborhood.obsm["X_spatial"], dense_sample.obsm["X_spatial"])
     assert set(ad_neighborhood.var.index) == set(dense_sample.obs["cell_type"].cat.categories)
     assert ad_neighborhood.obs.index.equals(dense_sample.obs.index)
     assert np.allclose(
@@ -60,6 +62,7 @@ def test_neighborhood_dense_nonnormalized_neighborhood_groups(dense_sample):
         neighborhood_groups = ["T"]
     )
     assert ad_neighborhood.obs["cell_type"].equals(dense_sample.obs["cell_type"])
+    assert np.allclose(ad_neighborhood.obsm["X_spatial"], dense_sample.obsm["X_spatial"])
     assert set(ad_neighborhood.var.index) == {"T"}
     assert ad_neighborhood.obs.index.equals(dense_sample.obs.index)
     assert np.allclose(ad_neighborhood.X, dense_sample_3_radius[["T"]].to_numpy())
@@ -70,7 +73,7 @@ def test_neighborhood_dense_nonnormalized_neighborhood_groups(dense_sample):
     )
 
 
-def test_neighborhood_dense_normalized_neighborhood_groups(dense_sample):
+def test_neighborhood_dense_normalized_neighborhood_groups(dense_sample, dense_sample_3_radius):
     ad_neighborhood = mb.calc.neighborhood_profile(
         dense_sample,
         groupby = "cell_type",
@@ -78,6 +81,7 @@ def test_neighborhood_dense_normalized_neighborhood_groups(dense_sample):
         neighborhood_groups = ["T"]
     )
     assert ad_neighborhood.obs["cell_type"].equals(dense_sample.obs["cell_type"])
+    assert np.allclose(ad_neighborhood.obsm["X_spatial"], dense_sample.obsm["X_spatial"])
     assert set(ad_neighborhood.var.index) == {"T"}
     assert ad_neighborhood.obs.index.equals(dense_sample.obs.index)
     assert np.allclose(
@@ -92,7 +96,7 @@ def test_neighborhood_dense_normalized_neighborhood_groups(dense_sample):
     )
 
 
-def test_neighborhood_dense_nonnormalized_subset_groups(dense_sample):
+def test_neighborhood_dense_nonnormalized_subset_groups(dense_sample, dense_sample_3_radius):
     ad_neighborhood = mb.calc.neighborhood_profile(
         dense_sample,
         groupby = "cell_type",
@@ -102,6 +106,8 @@ def test_neighborhood_dense_nonnormalized_subset_groups(dense_sample):
     )
     assert ad_neighborhood.obs["cell_type"].equals(
         dense_sample[dense_sample.obs["cell_type"] == "T"].obs["cell_type"])
+    assert np.allclose(ad_neighborhood.obsm["X_spatial"],
+                       dense_sample[dense_sample.obs["cell_type"] == "T"].obsm["X_spatial"])
     assert set(ad_neighborhood.obs["cell_type"]) == {"T"}
     assert set(ad_neighborhood.var.index) == set(dense_sample.obs["cell_type"])
     assert ad_neighborhood.obs.index.equals(
@@ -111,12 +117,12 @@ def test_neighborhood_dense_nonnormalized_subset_groups(dense_sample):
     assert ad_neighborhood.uns["neighbor_radius"] == 3
     assert np.allclose(
         ad_neighborhood.obs["n_neighbors"],
-        np.sum(dense_sample_3_radius[["T", "DC"]].to_numpy(), axis = 1)
-               [dense_sample_3_radius["cell_type"] == "T"]
+        np.sum(dense_sample_3_radius[["T", "DC"]].to_numpy(), axis = 1)[
+            dense_sample_3_radius["cell_type"] == "T"]
     )
 
 
-def test_neighborhood_dense_normalized_subset_groups(dense_sample):
+def test_neighborhood_dense_normalized_subset_groups(dense_sample, dense_sample_3_radius):
     ad_neighborhood = mb.calc.neighborhood_profile(
         dense_sample,
         groupby = "cell_type",
@@ -125,6 +131,8 @@ def test_neighborhood_dense_normalized_subset_groups(dense_sample):
     )
     assert ad_neighborhood.obs["cell_type"].equals(
         dense_sample[dense_sample.obs["cell_type"] == "T"].obs["cell_type"])
+    assert np.allclose(ad_neighborhood.obsm["X_spatial"],
+                       dense_sample[dense_sample.obs["cell_type"] == "T"].obsm["X_spatial"])
     assert set(ad_neighborhood.obs["cell_type"]) == {"T"}
     assert set(ad_neighborhood.var.index) == set(dense_sample.obs["cell_type"])
     assert ad_neighborhood.obs.index.equals(
@@ -138,6 +146,6 @@ def test_neighborhood_dense_normalized_subset_groups(dense_sample):
     assert ad_neighborhood.uns["neighbor_radius"] == 3
     assert np.allclose(
         ad_neighborhood.obs["n_neighbors"],
-        np.sum(dense_sample_3_radius[["T", "DC"]].to_numpy(), axis = 1)
-               [dense_sample_3_radius["cell_type"] == "T"]
+        np.sum(dense_sample_3_radius[["T", "DC"]].to_numpy(), axis = 1)[
+            dense_sample_3_radius["cell_type"] == "T"]
     )
