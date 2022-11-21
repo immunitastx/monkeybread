@@ -133,7 +133,7 @@ def cell_contact_histplot(
     sns.histplot(expected_contacts, ax=ax, **kwargs)
     observed_count = ax.axvline(num_contacts, 0, 1, color="red", linestyle="--")
     plt.text(0.98, 0.98, f"p = {p_val : .2f}", transform=ax.transAxes, va="top", ha="right")
-    ax.legend(handles=[observed_count], labels=["Observed Count"])
+    ax.legend(handles=[observed_count], labels=["Observed Count"], loc="center left", bbox_to_anchor=(1, 0.5))
     ax.set_ylabel("Permutation Count")
     ax.set_xlabel("Cell Contact Counts")
     ax.set_title("Permuted Distribution of Counts")

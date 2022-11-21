@@ -84,7 +84,7 @@ def load_merscope(
     # Read transcripts
     if transcript_locations or (transcript_locations is None and os.path.exists(f"{folder}/{paths['transcripts']}")):
         data.uns["transcripts"] = pd.read_csv(
-            f"{folder}/{paths['transcripts']}", index_col=0, usecols=["gene", "global_x", "global_y"]
+            f"{folder}/{paths['transcripts']}", index_col=0, usecols=["Unnamed: 0", "gene", "global_x", "global_y"]
         )
     data.raw = data
     return data

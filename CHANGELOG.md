@@ -8,12 +8,17 @@ and this project adheres to [Semantic Versioning][].
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
-## [0.4.0]
+## [0.4.0] - 2022-11-21
 
 ### Added
 
 -   This changelog
 -   Neighborhood profile function
+
+### Fixed
+
+-   Plotting function legends now better located
+-   `load_merscope` maintains transcript ids
 
 ## [0.3.5] - 2022-11-21
 

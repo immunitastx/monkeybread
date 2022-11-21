@@ -65,7 +65,8 @@ def shortest_distances(
             threshold = expected_distances[1]
             threshold_line = axs[0].axvline(threshold, 0, 1.0, color="red", linestyle="--")
             axs[1].axvline(threshold, 0, 1.0, color="red", linestyle="--")
-            axs[0].legend(handles=[threshold_line], labels=["Threshold"])
+            axs[0].legend(handles=[threshold_line], labels=["Threshold"], loc="center left", bbox_to_anchor=(1, 0.5))
+        plt.tight_layout()
     if show:
         plt.show()
     else:
