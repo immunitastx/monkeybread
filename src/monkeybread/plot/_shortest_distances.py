@@ -1,6 +1,7 @@
+from typing import Optional, Tuple, Union
+
 import matplotlib.pyplot as plt
 import numpy as np
-from typing import Optional, Union, Tuple
 import seaborn as sns
 
 
@@ -8,7 +9,7 @@ def shortest_distances(
     distances: np.ndarray,
     expected_distances: Optional[Union[np.ndarray, Tuple[np.ndarray, float, float]]] = None,
     show: Optional[bool] = True,
-    **kwargs
+    **kwargs,
 ) -> Union[plt.Axes, Tuple[plt.Axes, plt.Axes]]:
     """Plots the results of shortest distances calculations in histogram format.
 
@@ -29,42 +30,37 @@ def shortest_distances(
     If `show = False`, returns nothing. Otherwise, returns a single Axes object or a tuple of
     two Axes objects if expected_distances is provided.
     """
+    # Set up plot structure
     ax = None
     axs = None
     if expected_distances is not None:
-        fig, axs = plt.subplots(nrows = 1, ncols = 2, figsize = (12, 4))
+        fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(12, 4))
         ax = axs[0]
-    ax = sns.histplot(
-        list(map(float, np.transpose(distances)[1])),
-        ax = ax,
-        legend = None,
-        stat = "density",
-        **kwargs
-    )
+
+    # Plot actual distances on first axis
+    ax = sns.histplot(list(map(float, np.transpose(distances)[1])), ax=ax, legend=None, stat="density", **kwargs)
+    # Plot expected distances distribution on second axis if exists
     if expected_distances is not None:
-        sns.histplot(
-            expected_distances[0],
-            ax = axs[1],
-            stat = "density",
-            **kwargs
-        )
+        sns.histplot(expected_distances[0], ax=axs[1], stat="density", **kwargs)
         max_y = max(axs[0].get_ylim(), axs[1].get_ylim())
         axs[0].set_ylim(max_y)
         axs[1].set_ylim(max_y)
-        x_bounds = min(axs[0].get_xlim()[0], axs[1].get_xlim()[0]), \
-            max(axs[0].get_xlim()[1], axs[1].get_xlim()[1])
+        x_bounds = min(axs[0].get_xlim()[0], axs[1].get_xlim()[0]), max(axs[0].get_xlim()[1], axs[1].get_xlim()[1])
         axs[0].set_xlim(x_bounds)
         axs[1].set_xlim(x_bounds)
+        # If p-value and threshold included, add to plots
         if type(expected_distances) == tuple:
-            axs[0].text(0.97, 0.97,
-                        f"p-value: {expected_distances[2]:.2f}",
-                        horizontalalignment = "right",
-                        verticalalignment = "top",
-                        transform = axs[0].transAxes
-                        )
+            axs[0].text(
+                0.97,
+                0.97,
+                f"p-value: {expected_distances[2]:.2f}",
+                horizontalalignment="right",
+                verticalalignment="top",
+                transform=axs[0].transAxes,
+            )
             threshold = expected_distances[1]
-            axs[0].axvline(threshold, 0, 1.0, color = "red", linestyle = '--')
-            axs[1].axvline(threshold, 0, 1.0, color = "red", linestyle = '--')
+            axs[0].axvline(threshold, 0, 1.0, color="red", linestyle="--")
+            axs[1].axvline(threshold, 0, 1.0, color="red", linestyle="--")
     if show:
         plt.show()
     else:

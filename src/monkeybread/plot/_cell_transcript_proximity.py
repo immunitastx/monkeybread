@@ -1,8 +1,9 @@
-from anndata import AnnData
-from typing import Optional, Union, List
-import seaborn as sns
+from typing import List, Optional, Union
+
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
+from anndata import AnnData
 
 
 def cell_transcript_proximity(
@@ -14,7 +15,7 @@ def cell_transcript_proximity(
     pairwise: Optional[bool] = False,
     show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
-    **kwargs
+    **kwargs,
 ) -> Optional[Union[plt.Axes, plt.Figure]]:
     """Plots cell boundaries and optionally transcripts in the surrounding area.
 
@@ -47,65 +48,70 @@ def cell_transcript_proximity(
     """
     if pairwise:
         if transcripts is None:
-            raise ValueError("When plotting pairwise by gene, you must provide the transcript \
-                            results from mb.calc.cell_transcript_proximity.")
-        genes = set(transcripts['gene'])
-        fig, axs = plt.subplots(nrows = len(genes), ncols = len(genes),
-                                figsize = (12, 8))
+            raise ValueError(
+                "When plotting pairwise by gene, you must provide the transcript \
+                            results from mb.calc.cell_transcript_proximity."
+            )
+        # Pull out unique genes from dataframe and create n x n subplots
+        genes = set(transcripts["gene"])
+        fig, axs = plt.subplots(nrows=len(genes), ncols=len(genes), figsize=(12, 8))
         for i, marker1 in enumerate(genes):
             for j, marker2 in enumerate(genes):
+                # Call function recursively for each pairwise comparison
                 cell_transcript_proximity(
                     adata,
                     cells,
-                    transcripts.loc[transcripts['gene'].isin({marker1, marker2}), :],
-                    legend = False,
-                    pairwise = False,
-                    ax = axs[i, j],
-                    s = 10,
-                    label = label,
-                    hue_order = [marker1, marker2],
-                    show = False
+                    transcripts.loc[transcripts["gene"].isin({marker1, marker2}), :],
+                    legend=False,
+                    pairwise=False,
+                    ax=axs[i, j],
+                    s=10,
+                    label=label,
+                    hue_order=[marker1, marker2],
+                    show=False,
+                    **kwargs,
                 )
+                # Set titles/labels on specific axes
                 axs[i, j].set_title(marker2 if i == 0 else None)
                 axs[i, j].set_ylabel(marker1 if j == 0 else None)
                 axs[i, j].set_xlabel(None)
                 axs[i, j].set_xticks([])
                 axs[i, j].set_yticks([])
         if label is not None:
+            # Add legend for cells
             legend_ax = axs[int((len(genes) - 1) / 2), len(genes) - 1]
             handles, labels = legend_ax.get_legend_handles_labels()
             by_label = dict(zip(labels, handles))
-            legend_ax.legend(by_label.values(), by_label.keys(),
-                             loc = 'center left', bbox_to_anchor = (1, 0.5))
-        plt.subplots_adjust(wspace = 0.1, hspace = 0.1)
+            legend_ax.legend(by_label.values(), by_label.keys(), loc="center left", bbox_to_anchor=(1, 0.5))
+        plt.subplots_adjust(wspace=0.1, hspace=0.1)
         if show:
             plt.show()
         else:
             return fig
     else:
+        # Pull out cell boundaries and plot according to label
         cell_bounds = adata[cells].obs["bounds"]
         ax = plt.axes() if ax is None else ax
         cell_labels = [None] * len(cell_bounds) if label is None else adata.obs[label][cells]
-        color_options = list(plt.get_cmap('tab20').colors)
+        color_options = list(plt.get_cmap("tab20").colors)
         label_codes = pd.Categorical(cell_labels).codes
-        lines = [
-            ax.plot(
-                bounds.T[0],
-                bounds.T[1],
-                color = color_options[label_codes[i]],
-                label = cell_labels[i]
-            ) for i, bounds in enumerate(cell_bounds)]
+        lines = [  # noqa: F841
+            ax.plot(bounds.T[0], bounds.T[1], color=color_options[label_codes[i]], label=cell_labels[i])
+            for i, bounds in enumerate(cell_bounds)
+        ]
+        # Plot transcripts if provided
         if transcripts is not None:
             sns.scatterplot(
-                x = transcripts['global_x'],
-                y = transcripts['global_y'],
-                hue = transcripts['gene'],
-                ax = ax,
-                legend = 'auto' if legend else None,
-                **kwargs
+                x=transcripts["global_x"],
+                y=transcripts["global_y"],
+                hue=transcripts["gene"],
+                ax=ax,
+                legend="auto" if legend else None,
+                **kwargs,
             )
+        # Add legend for cells + transcripts
         if legend:
-            ax.legend(loc = 'center left', bbox_to_anchor = (1, 0.5))
+            ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
         if show:
             plt.show()
         else:

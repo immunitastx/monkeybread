@@ -1,7 +1,8 @@
+from typing import List, Union
+
+import numpy as np
 from anndata import AnnData
 from sklearn.neighbors import NearestNeighbors
-from typing import Union, List
-import numpy as np
 
 
 def shortest_distances(
@@ -29,19 +30,20 @@ def shortest_distances(
     contains a cell index from group1, index 1 contains the distance to the nearest member of
     group2, and index 2 contains the index of the nearest member of group2.
     """
+    # Convert groups to lists if single group provided
     if type(group1) == str:
         group1 = [group1]
     if type(group2) == str:
         group2 = [group2]
-    group1_cells = adata[[g in group1 for g in adata.obs[groupby]]].copy()
-    group2_cells = adata[[g in group2 for g in adata.obs[groupby]]].copy()
-    nbrs = NearestNeighbors(n_neighbors = 1).fit(group2_cells.obsm["X_spatial"])
+
+    # Create adata views of cells from each group
+    group1_cells = adata[[g in group1 for g in adata.obs[groupby]]]
+    group2_cells = adata[[g in group2 for g in adata.obs[groupby]]]
+
+    # Find nearest neighbor in group2 from group1
+    nbrs = NearestNeighbors(n_neighbors=1).fit(group2_cells.obsm["X_spatial"])
     distances, indices = nbrs.kneighbors(group1_cells.obsm["X_spatial"])
     group2_indices = group2_cells.obs.index[indices.transpose()[0]].to_numpy()
-    return np.array(list(
-        zip(
-            group1_cells.obs.index,
-            distances.transpose()[0],
-            group2_indices
-        )
-    ))
+
+    # Return array of lists mapping each group1 cell to its nearest group2 cell, including distance
+    return np.array(list(zip(group1_cells.obs.index, distances.transpose()[0], group2_indices)))
