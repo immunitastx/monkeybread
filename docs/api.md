@@ -19,6 +19,7 @@ import monkeybread as mb
     calc.cell_transcript_proximity
     calc.kernel_density
     calc.shortest_distances
+    calc.neighborhood_profile
 ```
 
 ## Plotting: `plot`

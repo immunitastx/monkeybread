@@ -2,6 +2,7 @@ import anndata as ad
 import numpy as np
 from typing import List, Dict, Optional, Tuple
 import pytest
+import pandas as pd
 
 
 def create_sample(data: Dict[str, List[List[float]]], dims: Optional[Tuple[float, float]] = None):
@@ -12,7 +13,7 @@ def create_sample(data: Dict[str, List[List[float]]], dims: Optional[Tuple[float
             "X_spatial": np.array([coords for key, val in data.items() for coords in val]),
         },
         obs = {
-            "cell_type": np.array([ct for ct, val in data.items() for _ in val]),
+            "cell_type": pd.Categorical([ct for ct, val in data.items() for _ in val]),
         },
         oidx = np.array([str(i) for i in range(num_cells)]),
         vidx = np.array([chr(i) for i in range(65, 91)]),
@@ -27,7 +28,7 @@ def create_sample(data: Dict[str, List[List[float]]], dims: Optional[Tuple[float
 @pytest.fixture(scope = "module")
 def dense_sample():
     return create_sample({
-        "DC": [
+        "ct1": [
             [2, 2],
             [2.5, 6.5],
             [3, 6],
@@ -35,7 +36,7 @@ def dense_sample():
             [5, 8],
             [7, 5],
         ],
-        "T": [
+        "ct2": [
             [3, 4],
             [3, 5],
             [4, 4],
@@ -53,11 +54,11 @@ def dense_sample():
 @pytest.fixture(scope = "module")
 def sparse_sample():
     return create_sample({
-        "DC": [
+        "ct1": [
             [1, 8],
             [6, 1]
         ],
-        "T": [
+        "ct2": [
             [1, 5],
             [2, 7],
             [2, 8],
