@@ -1,8 +1,10 @@
-from anndata import AnnData
-from typing import Optional, Union, Dict, List
-import pandas as pd
+import math
+from typing import Dict, Optional, Union
+
 import matplotlib.pyplot as plt
+import pandas as pd
 import scanpy as sc
+from anndata import AnnData
 
 
 def kernel_density(
@@ -12,7 +14,7 @@ def kernel_density(
     cmap: Optional[str] = None,
     show: Optional[bool] = True,
     title: Optional[str] = None,
-    ax: Optional[plt.Axes] = None
+    ax: Optional[plt.Axes] = None,
 ) -> Optional[Union[plt.Figure, plt.Axes]]:
     """Plots the results of :func:`monkeybread.calc.kernel_density` using :func:`scanpy.pl.embedding`.
 
@@ -41,43 +43,31 @@ def kernel_density(
         (if `key` is a string). If `show = True` returns nothing.
     """
     if type(key) == dict:
+        # Set up subplot dimensions (max columns 4)
         ncols = min(len(key), 4)
-        nrows = int(len(key) / ncols) + 1
+        nrows = math.ceil(len(key) / ncols)
         for (index, (category, column)) in enumerate(key.items()):
+            # Plot recursively for each column calculated
             axs = plt.subplot(nrows, ncols, index + 1)
             kernel_density(
                 adata,
-                key = column,
-                spot_size = spot_size,
-                cmap = cmap,
-                show = False,
-                title = category,
-                ax = axs,
+                key=column,
+                spot_size=spot_size,
+                cmap=cmap,
+                show=False,
+                title=category,
+                ax=axs,
             )
-        plt.subplots_adjust(
-            left = 0.1,
-            bottom = 0.1,
-            right = 0.9,
-            top = 0.9,
-            wspace = 0.4,
-            hspace = 0.4
-        )
+        # Add some whitespace
+        plt.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.4, hspace=0.4)
         if show:
             plt.show()
         else:
             return plt.gcf()
     else:
+        # Use scanpy's built in embedding, coloring based on density key added to adata
         axs = sc.pl.embedding(
-            adata,
-            basis = "spatial",
-            color = key,
-            s = spot_size,
-            cmap = cmap,
-            show = show,
-            title = title,
-            ax = ax,
-            vmin = 0.0,
-            vmax = 1.0
+            adata, basis="spatial", color=key, s=spot_size, cmap=cmap, show=show, title=title, ax=ax, vmin=0.0, vmax=1.0
         )
         if not show:
             return axs
