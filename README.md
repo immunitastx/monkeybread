@@ -7,7 +7,8 @@
 [link-tests]: https://github.com/immunitastx/monkeybread/actions/workflows/test.yml
 [badge-docs]: https://img.shields.io/readthedocs/monkeybread
 
-Tool for analyzing cell closeness in spatial transcriptomic data
+Tool for analyzing cell closeness in spatial transcriptomic data. Developed at
+[Immunitas Therapeutics](https://www.immunitastx.com/).
 
 ## Getting started
 
