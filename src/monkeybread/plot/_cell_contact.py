@@ -131,8 +131,12 @@ def cell_contact_histplot(
     # Plot expected contact count distribution with vertical line for observed contacts and
     # annotated p-value
     sns.histplot(expected_contacts, ax=ax, **kwargs)
-    ax.axvline(num_contacts, 0, 1, color="red", linestyle="--")
+    observed_count = ax.axvline(num_contacts, 0, 1, color="red", linestyle="--")
     plt.text(0.98, 0.98, f"p = {p_val : .2f}", transform=ax.transAxes, va="top", ha="right")
+    ax.legend(handles=[observed_count], labels=["Observed Count"])
+    ax.set_ylabel("Permutation Count")
+    ax.set_xlabel("Cell Contact Counts")
+    ax.set_title("Permuted Distribution of Counts")
     if show:
         plt.show()
     else:
@@ -232,6 +236,9 @@ def cell_contact_heatmap(
         fmt=fmt,
         **kwargs,
     )
+    ax.set_ylabel("Group 1")
+    ax.set_xlabel("Group 2")
+    ax.set_title("Observed Contacts" if expected_contacts is None else "Contact p-values")
     if show:
         plt.show()
     else:

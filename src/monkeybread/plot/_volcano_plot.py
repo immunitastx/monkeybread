@@ -45,6 +45,8 @@ def volcano_plot(
     """
     if filter_kwargs is None:
         filter_kwargs = {}
+    if title is None:
+        title = f"{key} {group}"
     # Pull dataframe from adata object, and select columns of interest
     de_df = sc.get.rank_genes_groups_df(adata, group=group, key=key, **filter_kwargs)
     logfold = de_df["logfoldchanges"]

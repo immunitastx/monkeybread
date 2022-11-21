@@ -32,22 +32,26 @@ def shortest_distances(
     """
     # Set up plot structure
     ax = None
-    axs = None
+    axs: Tuple[Optional[plt.Axes], Optional[plt.Axes]] = (None, None)
     if expected_distances is not None:
         fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(12, 4))
         ax = axs[0]
 
     # Plot actual distances on first axis
     ax = sns.histplot(list(map(float, np.transpose(distances)[1])), ax=ax, legend=None, stat="density", **kwargs)
+    ax.set_title("Observed Shortest Distances")
     # Plot expected distances distribution on second axis if exists
     if expected_distances is not None:
         sns.histplot(expected_distances[0], ax=axs[1], stat="density", **kwargs)
+        axs[1].set_title("Expected Shortest Distances")
         max_y = max(axs[0].get_ylim(), axs[1].get_ylim())
         axs[0].set_ylim(max_y)
         axs[1].set_ylim(max_y)
         x_bounds = min(axs[0].get_xlim()[0], axs[1].get_xlim()[0]), max(axs[0].get_xlim()[1], axs[1].get_xlim()[1])
         axs[0].set_xlim(x_bounds)
         axs[1].set_xlim(x_bounds)
+        axs[0].set_xlabel("Distance")
+        axs[1].set_xlabel("Distance")
         # If p-value and threshold included, add to plots
         if type(expected_distances) == tuple:
             axs[0].text(
@@ -59,8 +63,9 @@ def shortest_distances(
                 transform=axs[0].transAxes,
             )
             threshold = expected_distances[1]
-            axs[0].axvline(threshold, 0, 1.0, color="red", linestyle="--")
+            threshold_line = axs[0].axvline(threshold, 0, 1.0, color="red", linestyle="--")
             axs[1].axvline(threshold, 0, 1.0, color="red", linestyle="--")
+            axs[0].legend(handles=[threshold_line], labels=["Threshold"])
     if show:
         plt.show()
     else:

@@ -109,6 +109,9 @@ def cell_transcript_proximity(
                 legend="auto" if legend else None,
                 **kwargs,
             )
+        ax.set_title(f"Cell Boundaries{' and Transcripts' if transcripts is not None else ''}")
+        ax.set_ylabel("spatial_y")
+        ax.set_xlabel("spatial_x")
         # Add legend for cells + transcripts
         if legend:
             ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))
