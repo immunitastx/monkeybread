@@ -52,6 +52,7 @@ def cell_transcript_proximity(
                 "When plotting pairwise by gene, you must provide the transcript \
                             results from mb.calc.cell_transcript_proximity."
             )
+
         # Pull out unique genes from dataframe and create n x n subplots
         genes = set(transcripts["gene"])
         fig, axs = plt.subplots(nrows=len(genes), ncols=len(genes), figsize=(12, 8))
@@ -71,12 +72,14 @@ def cell_transcript_proximity(
                     show=False,
                     **kwargs,
                 )
+
                 # Set titles/labels on specific axes
                 axs[i, j].set_title(marker2 if i == 0 else None)
                 axs[i, j].set_ylabel(marker1 if j == 0 else None)
                 axs[i, j].set_xlabel(None)
                 axs[i, j].set_xticks([])
                 axs[i, j].set_yticks([])
+
         if label is not None:
             # Add legend for cells
             legend_ax = axs[int((len(genes) - 1) / 2), len(genes) - 1]
@@ -99,6 +102,7 @@ def cell_transcript_proximity(
             ax.plot(bounds.T[0], bounds.T[1], color=color_options[label_codes[i]], label=cell_labels[i])
             for i, bounds in enumerate(cell_bounds)
         ]
+
         # Plot transcripts if provided
         if transcripts is not None:
             sns.scatterplot(
@@ -112,6 +116,7 @@ def cell_transcript_proximity(
         ax.set_title(f"Cell Boundaries{' and Transcripts' if transcripts is not None else ''}")
         ax.set_ylabel("spatial_y")
         ax.set_xlabel("spatial_x")
+
         # Add legend for cells + transcripts
         if legend:
             ax.legend(loc="center left", bbox_to_anchor=(1, 0.5))

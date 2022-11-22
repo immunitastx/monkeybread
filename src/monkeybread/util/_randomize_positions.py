@@ -33,6 +33,7 @@ def randomize_positions(
     transformations = np.empty((adata.shape[0], 2))
     for i in range(adata.shape[0]):
         transformations[i] = [math.sin(math.pi * rand.random()) * radius, math.cos(math.pi * rand.random()) * radius]
+
     # Apply transformations to real coordinates (numpy does this element-wise)
     if return_positions:
         return transformations + adata.obsm[f"X_{basis}"]

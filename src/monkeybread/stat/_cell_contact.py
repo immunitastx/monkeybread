@@ -82,6 +82,7 @@ def cell_contact(
         perm_i_contact = mb.calc.cell_contact(
             group_cells, groupby, group1, group2, radius=contact_radius, basis=f"{basis}_random"
         )
+
         if split_groups:
             # Splits groups into pairwise comparisons
             # Preferred over recursion to minimize randomization of positions

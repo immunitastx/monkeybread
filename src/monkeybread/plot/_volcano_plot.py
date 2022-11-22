@@ -47,15 +47,19 @@ def volcano_plot(
         filter_kwargs = {}
     if title is None:
         title = f"{key} {group}"
+
     # Pull dataframe from adata object, and select columns of interest
     de_df = sc.get.rank_genes_groups_df(adata, group=group, key=key, **filter_kwargs)
     logfold = de_df["logfoldchanges"]
     pvals = de_df["pvals_adj" if adjusted_pvals else "pvals"]
+
     # Plot logfold and -log pvals
     ax = sns.scatterplot(x=logfold, y=np.negative(np.log10(pvals)), legend=None, **kwargs)
+
     # Add significance line at p = 0.05 and set title and axis labels
     ax.axhline(-np.log10(0.05), 0, 1, color="lightgray", zorder=-10)
     ax.set(ylabel="-log10(pval)", xlabel="logfoldchange", title=title)
+
     if show:
         plt.show()
     else:

@@ -70,24 +70,31 @@ def shortest_distances(
     n_coords = sum([Counter(filtered_data.obs[groupby])[g] for g in group2])
     coords = list(filtered_data.obsm[f"X_{basis}"])
     statistics = np.zeros(n_perms)
+
     for i in range(n_perms):
         # For each permutation, randomly sample from the non-group1 coordinates and run
         # shortest distances calculation
         random_coords = rand.sample(coords, k=n_coords)
         nbrs = NearestNeighbors(n_neighbors=1).fit(random_coords)
         distances, indices = nbrs.kneighbors(group1_data)
+
         # Add distances to array
         all_distances.extend(distances.transpose()[0])
         if threshold is not None:
             # Add number of distances below threshold to statistics array
             statistics[i] = p_statistic(distances.transpose()[0])
+
     all_distances = np.array(all_distances)
+
     if actual is None or threshold is None:
         # If observed and thresholds aren't provided, don't do p-value calculation
         return all_distances
+
     # Convert actual distances to floats and calculate number under threshold
     actual_statistic = p_statistic(np.vectorize(np.float)(actual))
+
     # Calculate p value by comparing actual statistic to each of the permutations
     # Add pseudocount to permutation
     p_val = np.mean([1 if statistic > actual_statistic else 0 for statistic in statistics] + [1])
+
     return all_distances, threshold, p_val

@@ -55,7 +55,9 @@ def load_merscope(
     for k, v in default_paths.items():
         if k not in paths:
             paths[k] = v
+
     data: ad.AnnData
+
     # Read cached data if exists
     if use_cache is not None:
         if use_cache == "all":
@@ -74,6 +76,7 @@ def load_merscope(
         data.obs["width"] = coordinates["max_x"].to_numpy() - coordinates["min_x"].to_numpy()
         data.obs["height"] = coordinates["max_y"].to_numpy() - coordinates["min_y"].to_numpy()
         data.obs["fov"] = coordinates["fov"].to_numpy()
+
     # Read cell bounds
     if cell_bounds or (cell_bounds is None and os.path.exists(f"{folder}/{paths['cell_bounds']}")):
         data.obs["bounds"] = np.array(data.obs.shape[0], dtype=object)
@@ -81,10 +84,12 @@ def load_merscope(
             with h5py.File(f"{folder}/{paths['cell_bounds']}/feature_data_{fov}.hdf5", "r") as f:
                 for cell_id in data.obs.index[data.obs["fov"] == fov]:
                     data.obs["bounds"][cell_id] = np.array(f[f"featuredata/{cell_id}/zIndex_0/p_0/coordinates"][0])
+
     # Read transcripts
     if transcript_locations or (transcript_locations is None and os.path.exists(f"{folder}/{paths['transcripts']}")):
         data.uns["transcripts"] = pd.read_csv(
             f"{folder}/{paths['transcripts']}", index_col=0, usecols=["Unnamed: 0", "gene", "global_x", "global_y"]
         )
+
     data.raw = data
     return data
