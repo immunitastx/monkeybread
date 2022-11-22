@@ -4,11 +4,10 @@ from typing import Optional
 
 import numpy as np
 from anndata import AnnData
-from tqdm.notebook import tqdm
 
 
 def randomize_positions(
-    adata: AnnData, radius: float, progress_bar: Optional[bool] = False, return_positions: Optional[bool] = False
+    adata: AnnData, radius: float, return_positions: Optional[bool] = False, basis: Optional[str] = "spatial"
 ) -> Optional[np.ndarray]:
     """Randomizes positions within a given radius.
 
@@ -18,11 +17,11 @@ def randomize_positions(
         Annotated data matrix. Coordinates are taken from `adata.obsm["X_spatial"]`.
     radius
         Radius to randomize within. Measured in same units as coordinates.
-    progress_bar
-        Whether to show a progress bar.
     return_positions
         Whether to return the randomized positions or assign them to
         `adata.obsm["X_spatial_random"]`.
+    basis
+        Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
 
     Returns
     -------
@@ -30,16 +29,12 @@ def randomize_positions(
     the coordinates in `adata.obsm["X_spatial"]`. Otherwise, these coordinates are assigned to
     `adata.obsm["X_spatial_random"]`.
     """
-    # Assign progress bar if input
-    bar = lambda x: x
-    if progress_bar:
-        bar = tqdm
     # Initialize array with deltas to apply to the real coordinates
     transformations = np.empty((adata.shape[0], 2))
-    for i in bar(range(adata.shape[0])):
+    for i in range(adata.shape[0]):
         transformations[i] = [math.sin(math.pi * rand.random()) * radius, math.cos(math.pi * rand.random()) * radius]
     # Apply transformations to real coordinates (numpy does this element-wise)
     if return_positions:
-        return transformations + adata.obsm["X_spatial"]
+        return transformations + adata.obsm[f"X_{basis}"]
     else:
-        adata.obsm["X_spatial_random"] = transformations + adata.obsm["X_spatial"]
+        adata.obsm[f"X_{basis}_random"] = transformations + adata.obsm[f"X_{basis}"]

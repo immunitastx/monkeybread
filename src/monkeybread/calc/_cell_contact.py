@@ -30,7 +30,7 @@ def cell_contact(
     group2
         Either one group or a list of groups from `adata.obs[groupby]`.
     basis
-        A key in `adata.obsm` to use for cell coordinates.
+        Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     radius
         The radius in which cells are considered touching. If not provided, will be calculated using
         half of the average radius of group1 + half of the average radius of group2. This requires
@@ -53,12 +53,9 @@ def cell_contact(
 
     # Infer radius if not provided
     if radius is None:
-        radius = np.mean(
-            [
-                np.mean([np.mean(group1_cells.obs["height"]), np.mean(group1_cells.obs["width"])]),
-                np.mean([np.mean(group2_cells.obs["height"]), np.mean(group2_cells.obs["width"])]),
-            ]
-        )
+        radius = 0.5 * np.mean(
+            [np.mean(group1_cells.obs["height"]), np.mean(group1_cells.obs["width"])]
+        ) + 0.5 * np.mean([np.mean(group2_cells.obs["height"]), np.mean(group2_cells.obs["width"])])
 
     # Find nearest neighbors within radius
     nbrs = NearestNeighbors(radius=radius).fit(group2_cells.obsm[obsm_key])
@@ -67,7 +64,7 @@ def cell_contact(
     # Filter out cells with no contact and pull out cell indices
     mask = [len(d) > 0 for d in distances]
     group1_indices = group1_cells.obs.index[mask]
-    group2_indices = [group2_cells.obs.index[index] for index in indices[mask]]
+    group2_indices = [group2_cells.obs.index[i] for i in indices[mask]]
 
     # Convert to adjacency list format and remove self contact
     touches = {

@@ -32,7 +32,7 @@ def cell_contact_embedding(
     group
         Column in `adata.obs` to label cell contacts by.
     basis
-        Grouping in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
+        Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     show
         Whether to show the plot or return the Axes object.
     ax

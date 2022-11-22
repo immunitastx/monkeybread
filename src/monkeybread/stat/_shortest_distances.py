@@ -15,6 +15,7 @@ def shortest_distances(
     n_perms: Optional[int] = 100,
     actual: Optional[np.ndarray] = None,
     threshold: Optional[float] = None,
+    basis: Optional[str] = "spatial",
 ) -> Union[np.ndarray, Tuple[np.ndarray, float, float]]:
     """Calculates an expected distribution of shortest distances via permutation of labels.
 
@@ -41,6 +42,8 @@ def shortest_distances(
         :func:`monkeybread.calc.shortest_distances`.
     threshold
         A distance threshold to use for significance calculation, in coordinate units.
+    basis
+        Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
 
     Returns
     -------
@@ -59,13 +62,13 @@ def shortest_distances(
         group2 = [group2]
 
     # Pulls out group1 spatial locations and the remaining data
-    group1_data = adata.obsm["X_spatial"][[g in group1 for g in adata.obs[groupby]]]
+    group1_data = adata.obsm[f"X_{basis}"][[g in group1 for g in adata.obs[groupby]]]
     filtered_data = adata[[g not in group1 for g in adata.obs[groupby]]]
 
     # Create distances + statistics arrays, number of cells in group2
     all_distances = []
     n_coords = sum([Counter(filtered_data.obs[groupby])[g] for g in group2])
-    coords = list(filtered_data.obsm["X_spatial"])
+    coords = list(filtered_data.obsm[f"X_{basis}"])
     statistics = np.zeros(n_perms)
     for i in range(n_perms):
         # For each permutation, randomly sample from the non-group1 coordinates and run
