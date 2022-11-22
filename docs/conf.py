@@ -9,7 +9,6 @@ import sys
 from datetime import datetime
 from importlib.metadata import metadata
 from pathlib import Path
-import sphinx_rtd_theme
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE / "extensions"))
@@ -89,12 +88,12 @@ source_suffix = {
 
 intersphinx_mapping = {
     "anndata": ("https://anndata.readthedocs.io/en/stable/", None),
-    "matplotlib": ('https://matplotlib.org/stable/', None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
-    "pandas": ('https://pandas.pydata.org/pandas-docs/stable/', None),
-    "python": ('https://docs.python.org/3', None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "python": ("https://docs.python.org/3", None),
     "scanpy": ("https://scanpy.readthedocs.io/en/stable/", None),
-    "seaborn": ('https://seaborn.pydata.org/', None)
+    "seaborn": ("https://seaborn.pydata.org/", None),
 }
 
 
@@ -109,18 +108,14 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
-html_theme_options = dict(
-    navigation_depth=4,
-    logo_only=True,
-    style_nav_header_background="#343131"
-)
+html_theme = "sphinx_rtd_theme"
+html_theme_options = {"navigation_depth": 4, "logo_only": True, "style_nav_header_background": "#343131"}
 github_url = repository_url
-html_static_path = ['_static']
+html_static_path = ["_static"]
 html_show_sphinx = False
 html_title = project_name
-html_logo = '_static/logo.png'
-html_favicon = '_static/logo.png'
+html_logo = "_static/logo.png"
+html_favicon = "_static/logo.png"
 
 pygments_style = "default"
 
