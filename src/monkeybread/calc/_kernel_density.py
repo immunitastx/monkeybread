@@ -1,3 +1,4 @@
+import itertools
 from collections import Counter, defaultdict
 from typing import Dict, List, Optional, Union
 
@@ -9,7 +10,7 @@ from sklearn.metrics import pairwise_distances
 def kernel_density(
     adata: AnnData,
     groupby: Optional[str] = "all",
-    group: Optional[Union[str, List[str]]] = "all",
+    groups: Optional[Union[str, List[str]]] = "all",
     groupname: Optional[str] = None,
     basis: Optional[str] = "spatial",
     bandwidth: Optional[float] = 1.0,
@@ -31,7 +32,7 @@ def kernel_density(
     groupby
         A categorical column in `obs` to use for density calculations. If omitted, each cell will
         contribute equally towards density calculations.
-    group
+    groups
         Groups in `adata.obs[groupby]` that contribute towards density.
     groupname
        Column in `adata.obs` to assign density values to.
@@ -49,78 +50,82 @@ def kernel_density(
     If `separate_groups = True`,  a dictionary mapping groups to keys in `adata.obs` is
     returned. If `separate_groups = False`, a single key in `adata.obs` is returned.
     """
-    # Convert group into a list of values in adata.obs[groupby]
-    if groupby != "all" and (type(group) == str or group is None):
-        if group != "all":
-            group = [group]
+    # Convert groups into a list of values in adata.obs[groupby]
+    if groupby != "all" and (type(groups) == str or groups is None):
+        if groups == "all" or groups is None:
+            groups = adata.obs[groupby].cat.categories
         else:
-            group = adata.obs[groupby].cat.categories
+            groups = [groups]
     if groupname is None:
-        groupname = "_".join(group)
+        groupname = "_".join(groups)
 
     # Multiply base resolution by 10 to get number of bins per row/column
     res = int(10 * resolution)
 
     # Calculate bounds of spatial coordinates, x and y increments for each bin, and number of bins
-    [(x_min, x_max), (y_min, y_max)] = [(min(x) - 0.01, max(x) + 0.01) for x in adata.obsm[f"X_{basis}"].transpose()]
+    [x_coords, y_coords] = adata.obsm[f"X_{basis}"].transpose()
+    (x_min, x_max) = (min(x_coords) - 0.01, max(x_coords) + 0.01)
+    (y_min, y_max) = (min(y_coords) - 0.01, max(y_coords) + 0.01)
     (x_inc, y_inc) = ((x_max - x_min) / res, (y_max - y_min) / res)
-    num_bins = int((x_max - x_min) / x_inc) * int((y_max - y_min) / y_inc)
+    num_bins = int(res**2)
 
     # Calculate distance from the center of each bin to the center of every other bin
-    distances = pairwise_distances(
-        [(x_min + x_inc * (i + 1) / 2, y_min + y_inc * (j + 1) / 2) for i in range(res) for j in range(res)]
-    )
+    x_bin_centers = [x_min + x_inc * (i + 1) / 2 for i in range(res)]
+    y_bin_centers = [y_min + y_inc * (j + 1) / 2 for j in range(res)]
+    bin_centers = list(itertools.product(x_bin_centers, y_bin_centers))
+    bin_distances = pairwise_distances(bin_centers)
 
     # Calculate kernel based on distances and bandwidth
-    kernel = 1 / np.exp(np.square(distances / bandwidth))
+    kernel = 1 / np.exp(np.square(bin_distances / bandwidth))
 
-    # Determine the kernel number of each cell based on its location
-    kernel_locations = [
-        int((x - x_min) / x_inc) * int((x_max - x_min) / x_inc) + int((y - y_min) / y_inc)
-        for (x, y) in adata.obsm[f"X_{basis}"]
-    ]
+    # Determine the bin each cell belongs to based on its location
+    # Bin number corresponds to index in bin_distancesx_c
+    location_to_bin = lambda x, y: int((x - x_min) / x_inc) * res + int((y - y_min) / y_inc)
+    cell_to_bin = [location_to_bin(x, y) for (x, y) in adata.obsm[f"X_{basis}"]]
 
-    # Counts the number of cells in group for each kernel
+    # Counts the number of cells in group for each bins
     if separate_groups:
-        kernel_counts = defaultdict(lambda: np.zeros(num_bins, dtype=int))
-        for (cell_group, location) in zip(adata.obs[groupby], kernel_locations):
-            kernel_counts[cell_group][location] += 1 if cell_group in group else 0
+        group_to_bin_counts = defaultdict(lambda: np.zeros(num_bins, dtype=int))
+        # Iterate over each cell, counting the number of each group in each bin
+        for (cell_group, bin_id) in zip(adata.obs[groupby], cell_to_bin):
+            group_to_bin_counts[cell_group][bin_id] += 1 if cell_group in groups else 0
     else:
-        kernel_counts = np.zeros(num_bins, dtype=int)
+        bin_counts = np.zeros(num_bins, dtype=int)
         if groupby == "all":
-            for location, count in Counter(kernel_locations).items():
-                kernel_counts[location] = count
+            for bin_id, count in Counter(cell_to_bin).items():
+                bin_counts[bin_id] = count
         else:
-            for (cell_group, location) in zip(adata.obs[groupby], kernel_locations):
-                kernel_counts[location] += 1 if groupby == "all" or cell_group in group else 0
+            # Iterate over each cell, counting the number in groups in each bin
+            for (cell_group, bin_id) in zip(adata.obs[groupby], cell_to_bin):
+                bin_counts[bin_id] += 1 if groupby == "all" or cell_group in groups else 0
 
     # Calculate the density of each kernel, and scale to be between 0 and 1
     if separate_groups:
-        kernel_densities = {
-            cell_group: np.matmul(kernel, value) / num_bins for (cell_group, value) in kernel_counts.items()
+        group_to_bin_densities = {
+            cell_group: np.matmul(kernel, bin_counts) / num_bins
+            for (cell_group, bin_counts) in group_to_bin_counts.items()
         }
-        mins = [min(densities) for densities in kernel_densities.values()]
-        maxes = [max(densities) for densities in kernel_densities.values()]
-        kernel_densities = {
-            cell_group: [(d - min) / (max - min) for d in kernel_densities[cell_group]]
-            for min, max, (cell_group, value) in zip(mins, maxes, kernel_densities.items())
+        mins = [min(densities) for densities in group_to_bin_densities.values()]
+        maxes = [max(densities) for densities in group_to_bin_densities.values()]
+        group_to_bin_densities = {
+            cell_group: [(d - min) / (max - min) for d in group_to_bin_densities[cell_group]]
+            for min, max, cell_group in zip(mins, maxes, group_to_bin_densities.keys())
         }
     else:
-        kernel_densities = np.matmul(kernel, kernel_counts) / num_bins
-        min_density, max_density = min(kernel_densities), max(kernel_densities)
+        bin_densities = np.matmul(kernel, bin_counts) / num_bins
+        min_density, max_density = min(bin_densities), max(bin_densities)
         if min_density != max_density:
-            kernel_densities = [(d - min_density) / (max_density - min_density) for d in kernel_densities]
+            bin_densities = [(d - min_density) / (max_density - min_density) for d in bin_densities]
 
     # Map kernel densities back to cells and assign to a column in obs
     if separate_groups:
         cell_densities = {
-            cell_group: [kernel_densities[cell_group][location] for location in kernel_locations]
-            for cell_group in group
+            cell_group: [group_to_bin_densities[cell_group][bin_id] for bin_id in cell_to_bin] for cell_group in groups
         }
         for (cell_group, densities) in cell_densities.items():
             adata.obs[f"{groupby}_density_{cell_group}"] = densities
         return {cell_group: f"{groupby}_density_{cell_group}" for cell_group in cell_densities.keys()}
     else:
-        cell_densities = [kernel_densities[location] for location in kernel_locations]
+        cell_densities = [bin_densities[bin_id] for bin_id in cell_to_bin]
         adata.obs[f"{groupby}_density_{groupname}"] = cell_densities
         return f"{groupby}_density_{groupname}"
