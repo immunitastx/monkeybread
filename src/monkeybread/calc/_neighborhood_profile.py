@@ -53,30 +53,36 @@ def neighborhood_profile(
     if adata.obs[groupby].dtype != "category":
         raise ValueError(f"adata.obs['{groupby}'] is not categorical.")
     categories = adata.obs[groupby].cat.categories
+
     # Calculate all contacts
-    contacts = mb.calc.cell_contact(adata, groupby, categories, categories, basis=basis, radius=radius)
-    group_mapping = adata.obs[groupby]
-    mask = [True] * adata.shape[0]
+    cell_to_neighbors = mb.calc.cell_contact(adata, groupby, categories, categories, basis=basis, radius=radius)
+    cell_to_group = adata.obs[groupby]
     if subset_groups is not None:
         mask = [g in subset_groups for g in adata.obs[groupby]]
-    # Sum the number of contacts for each cell
-    n_neighbors = np.array([len(contacts[cell]) if cell in contacts else 0 for cell in adata[mask].obs.index])
+    else:
+        mask = [True] * adata.shape[0]
+
     # Count the number of each group in the neighborhood of each cell
-    counters = {
-        cell: Counter(group_mapping[c] for c in contacts[cell]) if cell in contacts else {}
+    cell_to_neighbor_counts = {
+        cell: Counter(cell_to_group[c] for c in cell_to_neighbors[cell]) if cell in cell_to_neighbors else {}
         for cell in adata[mask].obs.index
     }
+
     # Turn counts into fractions for each cell summing to 1
-    adata_neighbors = pd.DataFrame(counters).T.fillna(0)
+    neighbors_df = pd.DataFrame(cell_to_neighbor_counts).T.fillna(0)
+    n_neighbors = neighbors_df.sum(axis=1)
     if normalize_counts:
-        adata_neighbors = adata_neighbors.apply(func=lambda arr: arr / np.sum(arr), axis=1).fillna(0)
+        neighbors_df = neighbors_df.apply(func=lambda arr: arr / np.sum(arr), axis=1).fillna(0)
+
     # Create a new AnnData object with cells as rows and group names as columns
     neighbor_adata = AnnData(
-        X=adata_neighbors,
-        obs=pd.DataFrame({"n_neighbors": n_neighbors, groupby: adata[mask].obs[groupby]}, index=adata[mask].obs.index),
+        X=neighbors_df,
+        obs=pd.DataFrame(
+            {"n_neighbors": n_neighbors, groupby: adata[neighbors_df.index].obs[groupby]}, index=neighbors_df.index
+        ),
         uns={"neighbor_radius": radius},
-        obsm={f"X_{basis}": adata[mask].obsm[f"X_{basis}"].copy()},
-        dtype=adata_neighbors.to_numpy().dtype,
+        obsm={f"X_{basis}": adata[neighbors_df.index].obsm[f"X_{basis}"].copy()},
+        dtype=neighbors_df.to_numpy().dtype,
     )
     if neighborhood_groups is not None:
         return neighbor_adata[:, neighborhood_groups].copy()
