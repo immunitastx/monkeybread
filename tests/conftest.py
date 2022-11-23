@@ -49,3 +49,10 @@ def sparse_sample():
     return create_sample(
         {"ct1": [[1, 8], [6, 1]], "ct2": [[1, 5], [2, 7], [2, 8], [4, 3], [5, 1], [6, 2]]}, dims=(1, 3)
     )
+
+
+@pytest.fixture(scope="module")
+def ct3_sample():
+    return create_sample(
+        {"ct1": [[1, 8], [6, 1]], "ct2": [[1, 5], [4, 3]], "ct3": [[2, 7], [2, 8], [5, 1], [6, 2]]}, dims=(1, 3)
+    )

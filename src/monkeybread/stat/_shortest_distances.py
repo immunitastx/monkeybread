@@ -52,8 +52,8 @@ def shortest_distances(
     is the array containing the expected distribution. The second element corresponds to the
     threshold, and the third element is the p-value calculated.
     """
-    # Calculates the number of distances under the threshold
-    p_statistic = lambda x: np.count_nonzero(np.less(x, threshold))
+    # Calculates the number of distances within the threshold
+    p_statistic = lambda x: np.count_nonzero(np.less_equal(x, threshold))
 
     # Converts groups to lists if one group provided
     if type(group1) == str:
@@ -81,7 +81,7 @@ def shortest_distances(
         # Add distances to array
         all_distances.extend(distances.transpose()[0])
         if threshold is not None:
-            # Add number of distances below threshold to statistics array
+            # Add number of distances within threshold to statistics array
             statistics[i] = p_statistic(distances.transpose()[0])
 
     all_distances = np.array(all_distances)
@@ -91,10 +91,10 @@ def shortest_distances(
         return all_distances
 
     # Convert actual distances to floats and calculate number under threshold
-    actual_statistic = p_statistic(np.vectorize(np.float)(actual))
+    actual_statistic = p_statistic(actual.T[1].astype(float))
 
     # Calculate p value by comparing actual statistic to each of the permutations
     # Add pseudocount to permutation
-    p_val = np.mean([1 if statistic > actual_statistic else 0 for statistic in statistics] + [1])
+    p_val = np.mean([1 if statistic >= actual_statistic else 0 for statistic in statistics] + [1])
 
     return all_distances, threshold, p_val
