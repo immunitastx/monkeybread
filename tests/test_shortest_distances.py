@@ -91,7 +91,7 @@ def test_shortest_distance_ct3_ct1_significance(ct3_sample):
 def test_shortest_distance_ct1_ct3_insignificance(ct3_sample):
     shortest_distances = mb.calc.shortest_distances(ct3_sample, "cell_type", "ct1", "ct3")
     expected_distances, threshold, p_val = mb.stat.shortest_distances(
-        ct3_sample, "cell_type", "ct1", "ct3", actual=shortest_distances, threshold=1
+        ct3_sample, "cell_type", "ct1", "ct3", actual=shortest_distances, threshold=1, n_perms=1000
     )
     assert threshold == 1
     assert p_val > 0.50
