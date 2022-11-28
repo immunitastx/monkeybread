@@ -96,7 +96,9 @@ def cell_transcript_proximity(
         cell_bounds = adata[cells].obs["bounds"]
         ax = plt.axes() if ax is None else ax
         cell_labels = [None] * len(cell_bounds) if label is None else adata.obs[label][cells]
-        color_options = list(plt.get_cmap("tab20").colors)
+        color_options = (
+            list(plt.get_cmap("tab20").colors) if f"{label}_colors" not in adata.uns else adata.uns[f"{label}_colors"]
+        )
         label_codes = pd.Categorical(cell_labels).codes
         lines = [  # noqa: F841
             ax.plot(bounds.T[0], bounds.T[1], color=color_options[label_codes[i]], label=cell_labels[i])

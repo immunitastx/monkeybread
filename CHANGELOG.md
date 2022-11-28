@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning][].
 ### Changed
 
 -   `mb.calc.shortest_distances` now returns a DataFrame for easier indexing
+-   `mb.plot.cell_transcript_proximity` uses predetermined colors if previously added by Scanpy
 
 ## [0.4.2] - 2022-11-23
 
