@@ -2,11 +2,12 @@ from typing import Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 
 
 def shortest_distances(
-    distances: np.ndarray,
+    distances: pd.DataFrame,
     expected_distances: Optional[Union[np.ndarray, Tuple[np.ndarray, float, float]]] = None,
     show: Optional[bool] = True,
     **kwargs,
@@ -38,7 +39,7 @@ def shortest_distances(
         ax = axs[0]
 
     # Plot actual distances on first axis
-    ax = sns.histplot(list(map(float, np.transpose(distances)[1])), ax=ax, legend=None, stat="density", **kwargs)
+    ax = sns.histplot(distances["distance"], ax=ax, legend=None, stat="density", **kwargs)
     ax.set_title("Observed Shortest Distances")
 
     # Plot expected distances distribution on second axis if exists

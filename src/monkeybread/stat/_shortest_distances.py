@@ -3,6 +3,7 @@ from collections import Counter
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
+import pandas as pd
 from anndata import AnnData
 from sklearn.neighbors import NearestNeighbors
 
@@ -13,7 +14,7 @@ def shortest_distances(
     group1: Union[str, List[str]],
     group2: Union[str, List[str]],
     n_perms: Optional[int] = 100,
-    actual: Optional[np.ndarray] = None,
+    actual: Optional[pd.DataFrame] = None,
     threshold: Optional[float] = None,
     basis: Optional[str] = "spatial",
 ) -> Union[np.ndarray, Tuple[np.ndarray, float, float]]:
@@ -91,7 +92,7 @@ def shortest_distances(
         return all_distances
 
     # Convert actual distances to floats and calculate number under threshold
-    actual_statistic = p_statistic(actual.T[1].astype(float))
+    actual_statistic = p_statistic(actual["distance"])
 
     # Calculate p value by comparing actual statistic to each of the permutations
     # Add pseudocount to permutation

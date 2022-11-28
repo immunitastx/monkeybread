@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning][].
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [0.4.3] - 2022-11-28
+
+### Changed
+
+-   `mb.calc.shortest_distances` now returns a DataFrame for easier indexing
+
 ## [0.4.2] - 2022-11-23
 
 ### Fixed
