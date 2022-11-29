@@ -199,8 +199,8 @@ def cell_contact_heatmap(
         contact_df_annot = contact_df_normalized
     elif contacts is not None:
         # Pull out group1 and group2 from the contact dictionary
-        group1 = set(adata[list(contacts.keys())].obs[groupby])
-        group2 = set(adata[[v for vals in contacts.values() for v in vals]].obs[groupby])
+        group1 = sorted(set(adata[list(contacts.keys())].obs[groupby]))
+        group2 = sorted(set(adata[[v for vals in contacts.values() for v in vals]].obs[groupby]))
 
         # Count contacts for each pairwise group comparison and create dataframe
         contacting_counts = {

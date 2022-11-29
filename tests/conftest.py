@@ -1,3 +1,4 @@
+import random
 from typing import Dict, List, Optional, Tuple
 
 import anndata as ad
@@ -7,9 +8,10 @@ import pytest
 
 
 def create_sample(data: Dict[str, List[List[float]]], dims: Optional[Tuple[float, float]] = None):
+    random.seed(0)
     num_cells = sum(len(v) for v in data.values())
     sample = ad.AnnData(
-        X=np.array([np.array([abs(j - i) for j in range(65, 91)]) for i in range(num_cells)]),
+        X=np.array([np.array([random.random() * 8 for j in range(65, 91)]) for i in range(num_cells)]),
         obsm={
             "X_spatial": np.array([coords for key, val in data.items() for coords in val]),
         },
@@ -17,7 +19,7 @@ def create_sample(data: Dict[str, List[List[float]]], dims: Optional[Tuple[float
             "cell_type": pd.Categorical([ct for ct, val in data.items() for _ in val]),
         },
         oidx=np.array([str(i) for i in range(num_cells)]),
-        vidx=np.array([chr(i) for i in range(65, 91)]),
+        var=pd.DataFrame(index=np.array([chr(i) for i in range(65, 91)])),
         dtype=np.dtype(np.float32),
     )
     if dims is not None:
