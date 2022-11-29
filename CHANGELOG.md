@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning][].
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [0.4.4] - 2022-11-29
+
+### Added
+
+-   `mb.calc.neighborhood_profile` can take in a number of nearest neighbors to consider instead of radius
+
+### Changed
+
+-   `mb.plot.cell_contact_heatmap` sorts categories
+
 ## [0.4.3] - 2022-11-28
 
 ### Changed

@@ -4,6 +4,7 @@ from typing import Optional, Sequence
 import numpy as np
 import pandas as pd
 from anndata import AnnData
+from sklearn.neighbors import NearestNeighbors
 
 import monkeybread as mb
 
@@ -14,7 +15,8 @@ def neighborhood_profile(
     basis: Optional[str] = "spatial",
     neighborhood_groups: Optional[Sequence[str]] = None,
     subset_groups: Optional[Sequence[str]] = None,
-    radius: Optional[float] = 50,
+    radius: Optional[float] = None,
+    n_neighbors: Optional[int] = None,
     normalize_counts: Optional[bool] = True,
 ) -> AnnData:
     """Calculates a neighborhood profile for each cell.
@@ -40,6 +42,8 @@ def neighborhood_profile(
         cells in those groups will be included in the resulting `adata.obs_names`.
     radius
         Radius in coordinate space to include nearby cells for neighborhood profile calculation.
+    n_neighbors
+        Number of neighbors to consider for the neighborhood profile calculations.
     normalize_counts
         Normalize neighborhood counts to proportions instead of raw counts. Note, if
         `neighborhood_groups` is provided and `normalize_counts = True`, the normalization step will
@@ -54,9 +58,29 @@ def neighborhood_profile(
         raise ValueError(f"adata.obs['{groupby}'] is not categorical.")
     categories = adata.obs[groupby].cat.categories
 
-    # Calculate all contacts
-    cell_to_neighbors = mb.calc.cell_contact(adata, groupby, categories, categories, basis=basis, radius=radius)
+    if radius is not None and n_neighbors is not None:
+        raise ValueError("Cannot specify both radius and n_neighbors")
+
+    # Calculate cell -> neighbors dictionary
+    if radius is not None:
+        # Use radius to define neighborhood
+        cell_to_neighbors = mb.calc.cell_contact(adata, groupby, categories, categories, basis=basis, radius=radius)
+    elif n_neighbors is not None:
+        # Use set number of neighbors to define neighborhood
+        nbrs = NearestNeighbors(n_neighbors=n_neighbors + 1).fit(adata.obsm[f"X_{basis}"])
+        distances, indices = nbrs.kneighbors(adata.obsm[f"X_{basis}"])
+        # Convert to dictionary, remove self-inclusion
+        cell_to_neighbors = {
+            cell: set(adata[neighbors].obs.index).difference({cell})
+            for cell, neighbors in zip(adata.obs.index, indices)
+        }
+    else:
+        raise ValueError("Must specify either radius or n_neighbors")
+
+    # Get group for each cell
     cell_to_group = adata.obs[groupby]
+
+    # Remove certain cells from neighborhood calculations
     if subset_groups is not None:
         mask = [g in subset_groups for g in adata.obs[groupby]]
     else:
@@ -80,7 +104,7 @@ def neighborhood_profile(
         obs=pd.DataFrame(
             {"n_neighbors": n_neighbors, groupby: adata[neighbors_df.index].obs[groupby]}, index=neighbors_df.index
         ),
-        uns={"neighbor_radius": radius},
+        uns={"neighbor_radius": radius} if radius is not None else {},
         obsm={f"X_{basis}": adata[neighbors_df.index].obsm[f"X_{basis}"].copy()},
         dtype=neighbors_df.to_numpy().dtype,
     )
