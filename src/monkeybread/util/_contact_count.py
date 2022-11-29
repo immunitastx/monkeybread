@@ -24,10 +24,9 @@ def contact_count(contacts: Dict[str, Set[str]], group1: Set[str], group2: Set[s
     """
     # Sum number of g1-g2 contacts, then subtract half of the double counting that occurs when cells
     # are in both g1 and g2
-    return sum(0 if k not in group1 else sum(v in group2 for v in values) for k, values in contacts.items()) - int(
-        0.5
-        * sum(
-            sum(k in group1 and k in group2 and v in group1 and v in group2 for v in values)
-            for k, values in contacts.items()
-        )
+    initial_counts = sum(0 if k not in group1 else sum(v in group2 for v in values) for k, values in contacts.items())
+    double_counted = sum(
+        sum(k in group1 and k in group2 and v in group1 and v in group2 for v in values)
+        for k, values in contacts.items()
     )
+    return initial_counts - int(0.5 * double_counted)
