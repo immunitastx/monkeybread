@@ -10,7 +10,8 @@ mpl.use("agg")
 
 # In case pytest-nunit is not installed, defines a dummy fixture
 try:
-    pass
+    import pytest_nunit  # noqa
+
 except ModuleNotFoundError:
 
     @pytest.fixture

@@ -51,6 +51,7 @@ doc = [
 test = [
     "pytest",
     "pytest-cov",
+    "pytest_nunit"
 ]
 
 [tool.coverage.run]
