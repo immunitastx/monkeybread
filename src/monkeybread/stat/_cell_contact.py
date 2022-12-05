@@ -68,62 +68,64 @@ def cell_contact(
         group2 = [group2]
 
     # Pull out cells corresponding to both groups
-    group_cells = adata[[g in group1 or g in group2 for g in adata.obs[groupby]]].copy()
+    group_cells_ad = adata[[g in group1 or g in group2 for g in adata.obs[groupby]]].copy()
     g1_index = adata[[g in group1 for g in adata.obs[groupby]]].obs.index
     g2_index = adata[[g in group2 for g in adata.obs[groupby]]].obs.index
 
     # Runs through position permutations
     if split_groups:
-        perm_contact = {g1: {g2: np.zeros(n_perms) for g2 in group2} for g1 in group1}
+        perm_contact_counts = {g1: {g2: np.zeros(n_perms) for g2 in group2} for g1 in group1}
     else:
-        perm_contact = np.zeros(n_perms)
+        perm_contact_counts = np.zeros(n_perms)
     for i in range(n_perms):
-        mb.util.randomize_positions(group_cells, radius=perm_radius, basis=basis)
-        perm_i_contact = mb.calc.cell_contact(
-            group_cells, groupby, group1, group2, radius=contact_radius, basis=f"{basis}_random"
+        # Adds a layer X_{basis}_random to group_cells_ad.obsm
+        mb.util.randomize_positions(group_cells_ad, radius=perm_radius, basis=basis)
+        group1_to_group2_contact_cells = mb.calc.cell_contact(
+            group_cells_ad, groupby, group1, group2, radius=contact_radius, basis=f"{basis}_random"
         )
 
         if split_groups:
             # Splits groups into pairwise comparisons
             # Preferred over recursion to minimize randomization of positions
-            touches_dict = {
+            group1_to_group2_contact_counts = {
                 g1: {
                     g2: mb.util.contact_count(
-                        perm_i_contact,
-                        group_cells[group_cells.obs[groupby] == g1].obs.index,
-                        group_cells[group_cells.obs[groupby] == g2].obs.index,
+                        group1_to_group2_contact_cells,
+                        group_cells_ad[group_cells_ad.obs[groupby] == g1].obs.index,
+                        group_cells_ad[group_cells_ad.obs[groupby] == g2].obs.index,
                     )
                     for g2 in group2
                 }
                 for g1 in group1
             }
             for (g1, g2) in itertools.product(group1, group2):
-                perm_contact[g1][g2][i] = touches_dict[g1][g2]
+                perm_contact_counts[g1][g2][i] = group1_to_group2_contact_counts[g1][g2]
         else:
-            perm_contact[i] = mb.util.contact_count(perm_i_contact, g1_index, g2_index)
+            perm_contact_counts[i] = mb.util.contact_count(group1_to_group2_contact_cells, g1_index, g2_index)
 
     # Calculate p_values
     if split_groups:
-        actual_count = {
+        group1_to_group2_actual_counts = {
             g1: {
                 g2: mb.util.contact_count(
                     actual_contact,
-                    group_cells[group_cells.obs[groupby] == g1].obs.index,
-                    group_cells[group_cells.obs[groupby] == g2].obs.index,
+                    group_cells_ad[group_cells_ad.obs[groupby] == g1].obs.index,
+                    group_cells_ad[group_cells_ad.obs[groupby] == g2].obs.index,
                 )
                 for g2 in group2
             }
             for g1 in group1
         }
-        p_values = {
+        group1_to_group2_p_values = {
             g1: {
-                g2: (np.sum(np.where(perm_contact[g1][g2] >= actual_count[g1][g2], 1, 0)) + 1) / (n_perms + 1)
+                g2: (np.sum(np.where(perm_contact_counts[g1][g2] >= group1_to_group2_actual_counts[g1][g2], 1, 0)) + 1)
+                / (n_perms + 1)
                 for g2 in group2
             }
             for g1 in group1
         }
-        return pd.DataFrame(p_values)
+        return pd.DataFrame(group1_to_group2_p_values)
     else:
         actual_count = mb.util.contact_count(actual_contact, g1_index, g2_index)
-        p_val = (np.sum(np.where(perm_contact >= actual_count, 1, 0)) + 1) / (n_perms + 1)
-        return perm_contact, p_val
+        p_val = (np.sum(np.where(perm_contact_counts >= actual_count, 1, 0)) + 1) / (n_perms + 1)
+        return perm_contact_counts, p_val
