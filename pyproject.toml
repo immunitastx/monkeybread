@@ -5,7 +5,7 @@ requires = ["hatchling"]
 
 [project]
 name = "monkeybread"
-version = "0.4.0"
+version = "0.4.4"
 description = "Tool for analyzing cell closeness in spatial transcriptomic data"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -29,7 +29,7 @@ dependencies = [
     "tqdm",
     "scikit-learn>=0.22",
     # for debug logging (referenced from the issue template)
-    "session-info"
+    "session-info",
 ]
 
 [project.optional-dependencies]
@@ -51,6 +51,7 @@ doc = [
 test = [
     "pytest",
     "pytest-cov",
+    "pytest_nunit"
 ]
 
 [tool.coverage.run]

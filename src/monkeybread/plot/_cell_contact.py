@@ -32,7 +32,7 @@ def cell_contact_embedding(
     group
         Column in `adata.obs` to label cell contacts by.
     basis
-        Grouping in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
+        Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     show
         Whether to show the plot or return the Axes object.
     ax
@@ -70,6 +70,7 @@ def cell_contact_embedding(
         size=(12000 / adata.shape[0]) * 5,
         **kwargs,
     )
+
     if show:
         plt.show()
     else:
@@ -134,9 +135,11 @@ def cell_contact_histplot(
     observed_count = ax.axvline(num_contacts, 0, 1, color="red", linestyle="--")
     plt.text(0.98, 0.98, f"p = {p_val : .2f}", transform=ax.transAxes, va="top", ha="right")
     ax.legend(handles=[observed_count], labels=["Observed Count"], loc="center left", bbox_to_anchor=(1, 0.5))
+
     ax.set_ylabel("Permutation Count")
     ax.set_xlabel("Cell Contact Counts")
     ax.set_title("Permuted Distribution of Counts")
+
     if show:
         plt.show()
     else:
@@ -196,8 +199,8 @@ def cell_contact_heatmap(
         contact_df_annot = contact_df_normalized
     elif contacts is not None:
         # Pull out group1 and group2 from the contact dictionary
-        group1 = set(adata[list(contacts.keys())].obs[groupby])
-        group2 = set(adata[[v for vals in contacts.values() for v in vals]].obs[groupby])
+        group1 = sorted(set(adata[list(contacts.keys())].obs[groupby]))
+        group2 = sorted(set(adata[[v for vals in contacts.values() for v in vals]].obs[groupby]))
 
         # Count contacts for each pairwise group comparison and create dataframe
         contacting_counts = {
@@ -227,7 +230,7 @@ def cell_contact_heatmap(
         fmt = kwargs["fmt"]
         del kwargs["fmt"]
 
-    # Create heatmap and either show or return ax
+    # Create heatmap
     sns.heatmap(
         contact_df_normalized,
         ax=ax,
@@ -236,9 +239,11 @@ def cell_contact_heatmap(
         fmt=fmt,
         **kwargs,
     )
+
     ax.set_ylabel("Group 1")
     ax.set_xlabel("Group 2")
     ax.set_title("Observed Contacts" if expected_contacts is None else "Contact p-values")
+
     if show:
         plt.show()
     else:

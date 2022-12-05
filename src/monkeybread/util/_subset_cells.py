@@ -46,11 +46,13 @@ def subset_cells(
     """
     if by != "spatial" and by != "gene":
         raise ValueError(f"Argument `by` must be one of 'gene' or 'spatial'. Value provided: {by}")
+
     if type(subset) is tuple:
         # Only one subsetting condition
         obs, relation, value = subset
         if relation not in cases:
             raise ValueError("Relation not one of 'gt', 'gte', 'lt', 'lte', 'eq'.")
+
         # Create mask based on condition (spatial or gene)
         if by == "spatial":
             mask = [
@@ -58,12 +60,14 @@ def subset_cells(
             ]
         elif by == "gene":
             mask = [cases[relation](count, value) for count in adata.transpose()[obs].X[0]]
+
     elif type(subset) is list:
         # Many subsetting conditions
         mask = np.full(adata.shape[0], fill_value=True)
         for (obs, relation, value) in subset:
             if relation not in cases:
                 raise ValueError("Relation not one of 'gt', 'gte', 'lt', 'lte', 'eq'.")
+
             # Loops through conditions, each time restricting the mask further
             if by == "spatial":
                 mask = np.logical_and(
@@ -75,17 +79,21 @@ def subset_cells(
                 )
             elif by == "gene":
                 mask = np.logical_and(mask, [cases[relation](count, value) for count in adata.transpose()[obs].X[0]])
+
     else:
         raise TypeError("Positional argument `subset` must be a tuple or list.")
+
     if label_obs is not None and label is not None:
         # Optionally label cells passing the filter
         if label_obs not in adata.obs:
             adata.obs[label_obs] = np.full(adata.shape[0], fill_value="Unknown")
+
         adata.obs[label_obs] = pd.Categorical(
             [
                 label if in_mask and existing == "Unknown" else existing
                 for (in_mask, existing) in zip(mask, adata.obs[label_obs])
             ]
         )
+
     # Return new AnnData object with mask applied
     return adata[mask].copy()

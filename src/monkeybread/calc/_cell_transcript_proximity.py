@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-import numpy as np
 import pandas as pd
 from anndata import AnnData
 
@@ -33,12 +32,11 @@ def cell_transcript_proximity(
         )
 
     # Extract bounds
-    cell_bounds = adata.obs["bounds"][cells].apply(np.transpose)
+    min_x = min(adata[cells].obsm["X_spatial"].T[0] - 0.5 * adata[cells].obs["width"])
+    max_x = max(adata[cells].obsm["X_spatial"].T[0] + 0.5 * adata[cells].obs["width"])
+    min_y = min(adata[cells].obsm["X_spatial"].T[1] - 0.5 * adata[cells].obs["height"])
+    max_y = max(adata[cells].obsm["X_spatial"].T[1] + 0.5 * adata[cells].obs["height"])
     transcripts = adata.uns["transcripts"]
-
-    # Find x and y boundaries of cells
-    mins = np.min(np.hstack(cell_bounds), axis=1)
-    maxes = np.max(np.hstack(cell_bounds), axis=1)
 
     # Subset by genes if provided
     if genes is not None:
@@ -46,9 +44,9 @@ def cell_transcript_proximity(
 
     # Subset transcripts by location based on x and y boundaries
     transcripts = transcripts[
-        (mins[0] <= transcripts["global_x"])
-        & (maxes[0] >= transcripts["global_x"])
-        & (mins[1] <= transcripts["global_y"])
-        & (maxes[1] >= transcripts["global_y"])
+        (min_x <= transcripts["global_x"])
+        & (max_x >= transcripts["global_x"])
+        & (min_y <= transcripts["global_y"])
+        & (max_y >= transcripts["global_y"])
     ]
     return transcripts

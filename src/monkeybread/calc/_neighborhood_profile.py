@@ -1,9 +1,12 @@
-from anndata import AnnData
+from collections import Counter
 from typing import Optional, Sequence
-import monkeybread as mb
+
 import numpy as np
 import pandas as pd
-from collections import Counter
+from anndata import AnnData
+from sklearn.neighbors import NearestNeighbors
+
+import monkeybread as mb
 
 
 def neighborhood_profile(
@@ -12,14 +15,16 @@ def neighborhood_profile(
     basis: Optional[str] = "spatial",
     neighborhood_groups: Optional[Sequence[str]] = None,
     subset_groups: Optional[Sequence[str]] = None,
-    radius: Optional[float] = 50,
+    radius: Optional[float] = None,
+    n_neighbors: Optional[int] = None,
     normalize_counts: Optional[bool] = True,
 ) -> AnnData:
-    """Calculates a neighborhood profile for each cell. The resulting AnnData object will have the
-    same index corresponding to rows/cells, but a new index corresponding to columns, one column for
-    each category in `adata.obs[groupby]`. Instead of a gene expression profile, each column
-    corresponds to the proportion of cells in the surrounding radius that belong to the respective
-    category.
+    """Calculates a neighborhood profile for each cell.
+
+    The resulting AnnData object will have the same index corresponding to rows/cells, but a new
+    index corresponding to columns, one column for each category in `adata.obs[groupby]`. Instead of
+    a gene expression profile, each column corresponds to the proportion of cells in the surrounding
+    radius that belong to the respective category.
 
     Parameters
     ----------
@@ -28,7 +33,7 @@ def neighborhood_profile(
     groupby
         A categorical column in `obs` to use for neighborhood profile calculations.
     basis
-        A key in `adata.obsm` to use for cell coordinates.
+        Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     neighborhood_groups
         A list of groups from `adata.obs[groupby]` to include in the resulting `adata.var_names`.
         Will not affect the calculations themselves, only which results are provided.
@@ -37,6 +42,8 @@ def neighborhood_profile(
         cells in those groups will be included in the resulting `adata.obs_names`.
     radius
         Radius in coordinate space to include nearby cells for neighborhood profile calculation.
+    n_neighbors
+        Number of neighbors to consider for the neighborhood profile calculations.
     normalize_counts
         Normalize neighborhood counts to proportions instead of raw counts. Note, if
         `neighborhood_groups` is provided and `normalize_counts = True`, the normalization step will
@@ -50,34 +57,56 @@ def neighborhood_profile(
     if adata.obs[groupby].dtype != "category":
         raise ValueError(f"adata.obs['{groupby}'] is not categorical.")
     categories = adata.obs[groupby].cat.categories
-    # Calculate all contacts
-    contacts = mb.calc.cell_contact(adata, groupby, categories, categories,
-                                    basis = basis, radius = radius)
-    group_mapping = adata.obs[groupby]
-    mask = [True] * adata.shape[0]
+
+    if radius is not None and n_neighbors is not None:
+        raise ValueError("Cannot specify both radius and n_neighbors")
+
+    # Calculate cell -> neighbors dictionary
+    if radius is not None:
+        # Use radius to define neighborhood
+        cell_to_neighbors = mb.calc.cell_contact(adata, groupby, categories, categories, basis=basis, radius=radius)
+    elif n_neighbors is not None:
+        # Use set number of neighbors to define neighborhood
+        nbrs = NearestNeighbors(n_neighbors=n_neighbors + 1).fit(adata.obsm[f"X_{basis}"])
+        distances, indices = nbrs.kneighbors(adata.obsm[f"X_{basis}"])
+        # Convert to dictionary, remove self-inclusion
+        cell_to_neighbors = {
+            cell: set(adata[neighbors].obs.index).difference({cell})
+            for cell, neighbors in zip(adata.obs.index, indices)
+        }
+    else:
+        raise ValueError("Must specify either radius or n_neighbors")
+
+    # Get group for each cell
+    cell_to_group = adata.obs[groupby]
+
+    # Remove certain cells from neighborhood calculations
     if subset_groups is not None:
         mask = [g in subset_groups for g in adata.obs[groupby]]
-    # Sum the number of contacts for each cell
-    n_neighbors = np.array([len(contacts[cell]) if cell in contacts else 0
-                            for cell in adata[mask].obs.index])
+    else:
+        mask = [True] * adata.shape[0]
+
     # Count the number of each group in the neighborhood of each cell
-    counters = {
-        cell: Counter(group_mapping[c] for c in contacts[cell]) if cell in contacts else dict()
+    cell_to_neighbor_counts = {
+        cell: Counter(cell_to_group[c] for c in cell_to_neighbors[cell]) if cell in cell_to_neighbors else {}
         for cell in adata[mask].obs.index
     }
+
     # Turn counts into fractions for each cell summing to 1
-    adata_neighbors = pd.DataFrame(counters).T.fillna(0)
+    neighbors_df = pd.DataFrame(cell_to_neighbor_counts).T.fillna(0)
+    n_neighbors = neighbors_df.sum(axis=1)
     if normalize_counts:
-        adata_neighbors = adata_neighbors.apply(func = lambda arr: arr / np.sum(arr), axis = 1)\
-            .fillna(0)
+        neighbors_df = neighbors_df.apply(func=lambda arr: arr / np.sum(arr), axis=1).fillna(0)
+
     # Create a new AnnData object with cells as rows and group names as columns
     neighbor_adata = AnnData(
-        X = adata_neighbors,
-        obs = pd.DataFrame({"n_neighbors": n_neighbors, groupby: adata[mask].obs[groupby]},
-                           index = adata[mask].obs.index),
-        uns = {"neighbor_radius": radius},
-        obsm = {f'X_{basis}': adata[mask].obsm[f'X_{basis}'].copy()},
-        dtype = adata_neighbors.to_numpy().dtype
+        X=neighbors_df,
+        obs=pd.DataFrame(
+            {"n_neighbors": n_neighbors, groupby: adata[neighbors_df.index].obs[groupby]}, index=neighbors_df.index
+        ),
+        uns={"neighbor_radius": radius} if radius is not None else {},
+        obsm={f"X_{basis}": adata[neighbors_df.index].obsm[f"X_{basis}"].copy()},
+        dtype=neighbors_df.to_numpy().dtype,
     )
     if neighborhood_groups is not None:
         return neighbor_adata[:, neighborhood_groups].copy()

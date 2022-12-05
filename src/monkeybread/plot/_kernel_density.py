@@ -46,6 +46,7 @@ def kernel_density(
         # Set up subplot dimensions (max columns 4)
         ncols = min(len(key), 4)
         nrows = math.ceil(len(key) / ncols)
+
         for (index, (category, column)) in enumerate(key.items()):
             # Plot recursively for each column calculated
             axs = plt.subplot(nrows, ncols, index + 1)
@@ -58,6 +59,7 @@ def kernel_density(
                 title=category,
                 ax=axs,
             )
+
         # Add some whitespace
         plt.subplots_adjust(left=0.1, bottom=0.1, right=0.9, top=0.9, wspace=0.4, hspace=0.4)
         if show:

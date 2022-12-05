@@ -5,8 +5,16 @@ import monkeybread as mb
 
 dense_sample_3_radius = pd.DataFrame(
     {
-        "ct2": [2, 5, 6, 7, 2, 5, 5, 5, 7, 4, 6, 7, 6, 2, 3, 1],
-        "ct1": [0, 3, 3, 3, 2, 1, 4, 3, 4, 4, 5, 3, 2, 0, 1, 1],
+        "ct2": [2, 5, 6, 7, 2, 5, 5, 5, 7, 4, 6, 7, 2, 6, 3, 1],
+        "ct1": [0, 3, 3, 3, 2, 1, 4, 3, 4, 4, 5, 3, 0, 2, 1, 1],
+        "cell_type": ["ct1"] * 6 + ["ct2"] * 10,
+    }
+)
+
+dense_sample_3_neighbors = pd.DataFrame(
+    {
+        "ct2": [3, 2, 1, 2, 2, 3, 2, 1, 2, 1, 2, 2, 3, 2, 2, 1],
+        "ct1": [0, 1, 2, 1, 1, 0, 1, 2, 1, 2, 1, 1, 0, 1, 1, 2],
         "cell_type": ["ct1"] * 6 + ["ct2"] * 10,
     }
 )
@@ -126,3 +134,16 @@ def test_neighborhood_dense_normalized_subset_groups(dense_sample):
         ad_neighborhood.obs["n_neighbors"],
         np.sum(dense_sample_3_radius[["ct2", "ct1"]].to_numpy(), axis=1)[dense_sample_3_radius["cell_type"] == "ct2"],
     )
+
+
+def test_neighborhood_dense_nonnormalized_n_neighbors(dense_sample):
+    ad_neighborhood = mb.calc.neighborhood_profile(
+        dense_sample, groupby="cell_type", n_neighbors=3, normalize_counts=False
+    )
+    assert ad_neighborhood.obs["cell_type"].equals(dense_sample.obs["cell_type"])
+    assert np.allclose(ad_neighborhood.obsm["X_spatial"], dense_sample.obsm["X_spatial"])
+    assert set(ad_neighborhood.var.index) == set(dense_sample.obs["cell_type"].cat.categories)
+    assert ad_neighborhood.obs.index.equals(dense_sample.obs.index)
+    assert np.allclose(ad_neighborhood.X, dense_sample_3_neighbors[["ct2", "ct1"]].to_numpy())
+    assert "neighbor_radius" not in ad_neighborhood.uns
+    assert np.allclose(ad_neighborhood.obs["n_neighbors"], np.repeat(3, ad_neighborhood.shape[0]))
