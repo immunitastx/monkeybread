@@ -47,6 +47,7 @@ doc = [
     # For notebooks
     "ipykernel",
     "sphinx-copybutton",
+    "ipython==8.4.0"
 ]
 test = [
     "pytest",
