@@ -1,6 +1,7 @@
 """Module for plotting."""
 from ._cell_contact import (
     cell_contact_embedding,
+    cell_contact_embedding_zoom,
     cell_contact_heatmap,
     cell_contact_histplot,
 )
