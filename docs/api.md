@@ -20,6 +20,7 @@ import monkeybread as mb
     calc.kernel_density
     calc.shortest_distances
     calc.neighborhood_profile
+    calc.ligand_receptor_score
 ```
 
 ## Plotting: `plot`
@@ -40,6 +41,7 @@ import monkeybread as mb
     plot.shortest_distances
     plot.volcano_plot
     plot.embedding_filter
+    plot.ligand_receptor_score
 ```
 
 ## Statistical Tests: `stat`
@@ -53,6 +55,7 @@ import monkeybread as mb
 
     stat.cell_contact
     stat.shortest_distances
+    stat.ligand_receptor_score
 ```
 
 ## Utility Functions: `util`
