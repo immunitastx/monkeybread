@@ -4,7 +4,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scanpy as sc
 import seaborn as sns
 from anndata import AnnData
 
@@ -53,24 +52,9 @@ def cell_contact_embedding(
     cell_list = set(contacts.keys())
     for s in contacts.values():
         cell_list = cell_list.union(s)
-    adata_contact = adata[list(cell_list.intersection(adata.obs.index))]
+    mask = list(cell_list.intersection(adata.obs.index))
 
-    # Plot all cells in light gray
-    sc.pl.embedding(
-        adata, basis=basis, na_color="lightgrey", show=False, alpha=0.5, ax=ax, size=12000 / adata.shape[0], **kwargs
-    )
-
-    # Plot contact cells, optionally colored (otherwise red)
-    sc.pl.embedding(
-        adata_contact,
-        basis=basis,
-        show=False,
-        ax=ax,
-        color=group,
-        na_color="red",
-        size=(12000 / adata.shape[0]) * 5,
-        **kwargs,
-    )
+    mb.plot.embedding_filter(adata, mask=mask, group=group, basis=basis, show=False, ax=ax, **kwargs)
 
     if show:
         plt.show()

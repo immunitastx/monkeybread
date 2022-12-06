@@ -39,6 +39,7 @@ import monkeybread as mb
     plot.kernel_density
     plot.shortest_distances
     plot.volcano_plot
+    plot.embedding_filter
 ```
 
 ## Statistical Tests: `stat`
