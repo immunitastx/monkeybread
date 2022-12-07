@@ -13,8 +13,8 @@ def neighborhood_profile(
     adata: AnnData,
     groupby: str,
     basis: Optional[str] = "spatial",
-    neighborhood_groups: Optional[Sequence[str]] = None,
-    subset_groups: Optional[Sequence[str]] = None,
+    subset_output_features: Optional[Sequence[str]] = None,
+    subset_cells_by_group: Optional[Sequence[str]] = None,
     radius: Optional[float] = None,
     n_neighbors: Optional[int] = None,
     normalize_counts: Optional[bool] = True,
@@ -34,10 +34,10 @@ def neighborhood_profile(
         A categorical column in `obs` to use for neighborhood profile calculations.
     basis
         Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
-    neighborhood_groups
+    subset_output_features
         A list of groups from `adata.obs[groupby]` to include in the resulting `adata.var_names`.
         Will not affect the calculations themselves, only which results are provided.
-    subset_groups
+    subset_cells_by_group
         A list of groups in `adata.obs[groupby]` to restrict the resulting AnnData object to. Only
         cells in those groups will be included in the resulting `adata.obs_names`.
     radius
@@ -46,7 +46,7 @@ def neighborhood_profile(
         Number of neighbors to consider for the neighborhood profile calculations.
     normalize_counts
         Normalize neighborhood counts to proportions instead of raw counts. Note, if
-        `neighborhood_groups` is provided and `normalize_counts = True`, the normalization step will
+        `subset_output_features` is provided and `normalize_counts = True`, the normalization step will
         be performed before removing groups, so proportions will not sum to 1.
 
     Returns
@@ -81,8 +81,8 @@ def neighborhood_profile(
     cell_to_group = adata.obs[groupby]
 
     # Remove certain cells from neighborhood calculations
-    if subset_groups is not None:
-        mask = [g in subset_groups for g in adata.obs[groupby]]
+    if subset_cells_by_group is not None:
+        mask = [g in subset_cells_by_group for g in adata.obs[groupby]]
     else:
         mask = [True] * adata.shape[0]
 
@@ -108,7 +108,7 @@ def neighborhood_profile(
         obsm={f"X_{basis}": adata[neighbors_df.index].obsm[f"X_{basis}"].copy()},
         dtype=neighbors_df.to_numpy().dtype,
     )
-    if neighborhood_groups is not None:
-        return neighbor_adata[:, neighborhood_groups].copy()
+    if subset_output_features is not None:
+        return neighbor_adata[:, subset_output_features].copy()
     else:
         return neighbor_adata
