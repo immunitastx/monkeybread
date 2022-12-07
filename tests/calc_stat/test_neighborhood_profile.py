@@ -53,7 +53,7 @@ def test_neighborhood_dense_normalized(dense_sample):
 
 def test_neighborhood_dense_nonnormalized_neighborhood_groups(dense_sample):
     ad_neighborhood = mb.calc.neighborhood_profile(
-        dense_sample, groupby="cell_type", radius=3, normalize_counts=False, neighborhood_groups=["ct2"]
+        dense_sample, groupby="cell_type", radius=3, normalize_counts=False, subset_output_features=["ct2"]
     )
     assert ad_neighborhood.obs["cell_type"].equals(dense_sample.obs["cell_type"])
     assert np.allclose(ad_neighborhood.obsm["X_spatial"], dense_sample.obsm["X_spatial"])
@@ -68,7 +68,7 @@ def test_neighborhood_dense_nonnormalized_neighborhood_groups(dense_sample):
 
 def test_neighborhood_dense_normalized_neighborhood_groups(dense_sample):
     ad_neighborhood = mb.calc.neighborhood_profile(
-        dense_sample, groupby="cell_type", radius=3, neighborhood_groups=["ct2"]
+        dense_sample, groupby="cell_type", radius=3, subset_output_features=["ct2"]
     )
     assert ad_neighborhood.obs["cell_type"].equals(dense_sample.obs["cell_type"])
     assert np.allclose(ad_neighborhood.obsm["X_spatial"], dense_sample.obsm["X_spatial"])
@@ -88,7 +88,7 @@ def test_neighborhood_dense_normalized_neighborhood_groups(dense_sample):
 
 def test_neighborhood_dense_nonnormalized_subset_groups(dense_sample):
     ad_neighborhood = mb.calc.neighborhood_profile(
-        dense_sample, groupby="cell_type", radius=3, normalize_counts=False, subset_groups=["ct2"]
+        dense_sample, groupby="cell_type", radius=3, normalize_counts=False, subset_cells_by_group=["ct2"]
     )
     assert ad_neighborhood.obs["cell_type"].equals(
         dense_sample[dense_sample.obs["cell_type"] == "ct2"].obs["cell_type"]
@@ -111,7 +111,9 @@ def test_neighborhood_dense_nonnormalized_subset_groups(dense_sample):
 
 
 def test_neighborhood_dense_normalized_subset_groups(dense_sample):
-    ad_neighborhood = mb.calc.neighborhood_profile(dense_sample, groupby="cell_type", radius=3, subset_groups=["ct2"])
+    ad_neighborhood = mb.calc.neighborhood_profile(
+        dense_sample, groupby="cell_type", radius=3, subset_cells_by_group=["ct2"]
+    )
     assert ad_neighborhood.obs["cell_type"].equals(
         dense_sample[dense_sample.obs["cell_type"] == "ct2"].obs["cell_type"]
     )
