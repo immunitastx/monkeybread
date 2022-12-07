@@ -41,7 +41,7 @@ import monkeybread as mb
     plot.shortest_distances
     plot.volcano_plot
     plot.embedding_filter
-    plot.ligand_receptor_score
+    plot.ligand_receptor_scatter
 ```
 
 ## Statistical Tests: `stat`
