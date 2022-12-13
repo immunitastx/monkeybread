@@ -20,6 +20,7 @@ import monkeybread as mb
     calc.kernel_density
     calc.shortest_distances
     calc.neighborhood_profile
+    calc.ligand_receptor_score
 ```
 
 ## Plotting: `plot`
@@ -32,12 +33,15 @@ import monkeybread as mb
     :toctree: generated
 
     plot.cell_contact_embedding
+    plot.cell_contact_embedding_zoom
     plot.cell_contact_histplot
     plot.cell_contact_heatmap
     plot.cell_transcript_proximity
     plot.kernel_density
     plot.shortest_distances
     plot.volcano_plot
+    plot.embedding_filter
+    plot.ligand_receptor_scatter
 ```
 
 ## Statistical Tests: `stat`
@@ -51,6 +55,7 @@ import monkeybread as mb
 
     stat.cell_contact
     stat.shortest_distances
+    stat.ligand_receptor_score
 ```
 
 ## Utility Functions: `util`

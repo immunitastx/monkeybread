@@ -1,9 +1,9 @@
 from typing import Dict, Optional, Set, Tuple
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import scanpy as sc
 import seaborn as sns
 from anndata import AnnData
 
@@ -21,7 +21,7 @@ def cell_contact_embedding(
 ) -> Optional[plt.Axes]:
     """Shows embeddings of cells in contact. Can be spatial or any other basis.
 
-    Plots the results of :func:`monkeybread.calc.cell_contact`, highlighting the cells in contacy.
+    Plots the results of :func:`monkeybread.calc.cell_contact`, highlighting the cells in contact.
 
     Parameters
     ----------
@@ -52,29 +52,106 @@ def cell_contact_embedding(
     cell_list = set(contacts.keys())
     for s in contacts.values():
         cell_list = cell_list.union(s)
-    adata_contact = adata[list(cell_list)]
+    mask = list(cell_list.intersection(adata.obs.index))
 
-    # Plot all cells in light gray
-    sc.pl.embedding(
-        adata, basis=basis, na_color="lightgrey", show=False, alpha=0.5, ax=ax, size=12000 / adata.shape[0], **kwargs
-    )
-
-    # Plot contact cells, optionally colored (otherwise red)
-    sc.pl.embedding(
-        adata_contact,
-        basis=basis,
-        show=False,
-        ax=ax,
-        color=group,
-        na_color="red",
-        size=(12000 / adata.shape[0]) * 5,
-        **kwargs,
-    )
+    mb.plot.embedding_filter(adata, mask=mask, group=group, basis=basis, show=False, ax=ax, **kwargs)
 
     if show:
         plt.show()
     else:
         return ax
+
+
+def cell_contact_embedding_zoom(
+    adata: AnnData,
+    contacts: Dict[str, Set[str]],
+    left_pct: float = None,
+    top_pct: float = None,
+    width_pct: float = None,
+    height_pct: float = None,
+    group: Optional[str] = None,
+    basis: Optional[str] = "spatial",
+    show: Optional[bool] = True,
+    **kwargs,
+) -> Optional[plt.Figure]:
+    """Shows embeddings of cells in contact with zoomed focus. Can be spatial or any other basis.
+
+    Plots the results of :func:`monkeybread.calc.cell_contact`, highlighting the cells in contact.
+    Zooms in on a specific rectangle in the plot, based on fractional coordinate space, for higher-resolution
+    viewing.
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix.
+    contacts
+        The actual cell contacts, as calculated by :func:`monkeybread.calc.cell_contact`.
+    left_pct
+        The fraction of the plot width to use as the left bound of the zoomed-in rectangle, e.g. 0.1
+        represents 10% from the left of the plot.
+    top_pct
+        The fraction of the plot height to use as the upper bound of the zoomed-in rectangle, e.g.
+        0.3 represents 30% from the top of the plot.
+    width_pct
+        The fraction of the plot width to use for the zoomed-in rectangle, e.g. 0.5 represents a
+        width half of the original plot.
+    height_pct
+        The fraction of the plot height to use for the zoomed-in rectangle, e.g. 0.25 represents a
+        height 25% of the original plot.
+    group
+        Column in `adata.obs` to label cell contacts by.
+    basis
+        Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
+    show
+        Whether to show the plot or return the Axes object.
+    kwargs
+        Keyword arguments that will be passed to :func:`scanpy.pl.embedding`.
+
+    Returns
+    -------
+    If `show = True`, returns nothing. Otherwise, returns the Figure object the plots are contained
+    within.
+    """
+    if not all([left_pct, top_pct, width_pct, height_pct]):
+        raise ValueError("Must provide left_pct, top_pct, width_pct, height_pct")
+
+    # Set up plot structure and plot original data
+    fig, axs = plt.subplots(nrows=1, ncols=2)
+    cell_contact_embedding(adata, contacts, basis=basis, group=group, show=False, ax=axs[0], **kwargs)
+    axs[0].get_legend().remove()
+
+    # Get scaling information and add rectangle
+    left, right = axs[0].get_xlim()
+    bottom, top = axs[0].get_ylim()
+    tot_width = right - left
+    tot_height = top - bottom
+    left_bound, zoom_width = (left + left_pct * tot_width, width_pct * tot_width)
+    top_bound, zoom_height = (top - top_pct * tot_height, height_pct * tot_height)
+    rect = mpl.patches.Rectangle(
+        (left_bound, top_bound - zoom_height), zoom_width, zoom_height, linewidth=1, edgecolor="black", facecolor="none"
+    )
+    axs[0].add_patch(rect)
+
+    # Subset anndata object
+    zoom_adata = mb.util.subset_cells(
+        adata,
+        by="spatial",
+        subset=[
+            ("x", "gte", left_bound),
+            ("x", "lte", left_bound + zoom_width),
+            ("y", "lte", top_bound),
+            ("y", "gte", top_bound - zoom_height),
+        ],
+    )
+
+    # Plot cell contact
+    cell_contact_embedding(zoom_adata, contacts, basis=basis, group=group, show=False, ax=axs[1], **kwargs)
+
+    # Return fig or show
+    if show:
+        plt.show()
+    else:
+        return fig
 
 
 def cell_contact_histplot(

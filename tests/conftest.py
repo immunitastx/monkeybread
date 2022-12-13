@@ -58,3 +58,21 @@ def ct3_sample():
     return create_sample(
         {"ct1": [[1, 8], [6, 1]], "ct2": [[1, 5], [4, 3]], "ct3": [[2, 7], [2, 8], [5, 1], [6, 2]]}, dims=(1, 3)
     )
+
+
+@pytest.fixture(scope="module")
+def sample_with_expression():
+    return ad.AnnData(
+        X=np.concatenate(
+            [
+                np.tile([[i, i, 10 - i] for i in range(10)], (2, 1)),
+            ]
+        ),
+        obsm={
+            "X_spatial": np.concatenate([np.array([[0, i] for i in range(10)]), np.array([[1, i] for i in range(10)])])
+        },
+        obs={"cell_type": pd.Categorical(np.repeat(["ct1", "ct2"], 10))},
+        oidx=np.array([str(i) for i in range(20)]),
+        var=pd.DataFrame(index=np.array(["A", "B", "C"])),
+        dtype=np.dtype(np.float32),
+    )

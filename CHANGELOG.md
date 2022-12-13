@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning][].
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [0.5.0] - 2022-12-13
+
+### Added
+
+-   Added ligand-receptor interaction calculation, statistical, and plotting functions
+-   Added cell contact zoom plot for more finely focused examination of cell contacts
+-   Added embedding filter plot for highlighting only certain groups while coloring by another metric
+
+### Changed
+
+-   Renamed arguments to `mb.calc.neighborhood_profile` for better understanding
+
 ## [0.4.4] - 2022-11-29
 
 ### Added
