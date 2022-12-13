@@ -16,7 +16,8 @@ def embedding_filter(
 ) -> Optional[plt.Axes]:
     """Shows a filtered embedding, allowing for examination of specific cells.
 
-    Cells in the mask will be
+    Cells in the mask will be larger and colored based on `group` if provided, otherwise red. Cells
+    not in the mask will be smaller and colored gray.
 
     Parameters
     ----------
@@ -26,7 +27,7 @@ def embedding_filter(
         A mask to apply to `adata.obs.index`. Can be a list of cell indices or a boolean mask with
         the same length as the index.
     group
-        Column in `adata.obs` to label cell contacts by.
+        Column in `adata.obs` or `adata.var_names` to label cell contacts by.
     basis
         Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     show
