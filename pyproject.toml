@@ -46,8 +46,8 @@ doc = [
     "sphinx-autodoc-typehints",
     # For notebooks
     "ipykernel",
+    "ipython==8.4.0",
     "sphinx-copybutton",
-    "ipython==8.4.0"
 ]
 test = [
     "pytest",
