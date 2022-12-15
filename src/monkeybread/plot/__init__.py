@@ -9,4 +9,3 @@ from ._embedding_other import embedding_filter, embedding_zoom
 from ._kernel_density import kernel_density
 from ._ligand_receptor import ligand_receptor_scatter
 from ._shortest_distances import shortest_distances
-from ._volcano_plot import volcano_plot
