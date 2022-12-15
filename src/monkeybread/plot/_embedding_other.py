@@ -133,7 +133,7 @@ def embedding_zoom(
     if mask is not None:
         embedding_filter(adata, mask, basis=basis, group=group, show=False, ax=axs[0], **kwargs)
     else:
-        sc.pl.embedding(adata, basis=basis, group=group, show=False, ax=axs[0], **kwargs)
+        sc.pl.embedding(adata, basis=basis, color=group, show=False, ax=axs[0], **kwargs)
     axs[0].get_legend().remove()
 
     # Get scaling information and add rectangle
@@ -165,7 +165,7 @@ def embedding_zoom(
         zoom_mask = list(set(adata[mask].obs.index).intersection(set(zoom_adata.obs.index)))
         embedding_filter(zoom_adata, zoom_mask, basis=basis, group=group, show=False, ax=axs[1], **kwargs)
     else:
-        sc.pl.embedding(zoom_adata, basis=basis, group=group, show=False, ax=axs[1], **kwargs)
+        sc.pl.embedding(zoom_adata, basis=basis, color=group, show=False, ax=axs[1], **kwargs)
 
     # Return fig or show
     if show:
