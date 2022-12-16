@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning][].
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [0.6.0] - 2022-12-16
+
+### Changed
+
+-   Changed `cell_contact_embedding_zoom` to `embedding_zoom` and abstracted functionality
+
+### Removed
+
+-   Removed volcano plot function
+
 ## [0.5.0] - 2022-12-13
 
 ### Added

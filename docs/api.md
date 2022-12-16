@@ -33,14 +33,13 @@ import monkeybread as mb
     :toctree: generated
 
     plot.cell_contact_embedding
-    plot.cell_contact_embedding_zoom
     plot.cell_contact_histplot
     plot.cell_contact_heatmap
     plot.cell_transcript_proximity
     plot.kernel_density
     plot.shortest_distances
-    plot.volcano_plot
     plot.embedding_filter
+    plot.embedding_zoom
     plot.ligand_receptor_scatter
 ```
 
