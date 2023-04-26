@@ -1,0 +1,10 @@
+diff a/README.md b/README.md	(rejected hunks)
+@@ -3,7 +3,7 @@
+ [![Tests][badge-tests]][link-tests]
+ [![Documentation][badge-docs]][link-docs]
+ 
+-[badge-tests]: https://img.shields.io/github/workflow/status/immunitastx/monkeybread/Test/main
++[badge-tests]: https://img.shields.io/github/actions/workflow/status/immunitastx/monkeybread/test.yaml?branch=main
+ [link-tests]: https://github.com/immunitastx/monkeybread/actions/workflows/test.yml
+ [badge-docs]: https://img.shields.io/readthedocs/monkeybread
+ 

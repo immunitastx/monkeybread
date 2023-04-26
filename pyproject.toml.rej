@@ -1,0 +1,9 @@
+diff a/pyproject.toml b/pyproject.toml	(rejected hunks)
+@@ -2,7 +2,6 @@
+ build-backend = "hatchling.build"
+ requires = ["hatchling"]
+ 
+-
+ [project]
+ name = "monkeybread"
+ version = "0.0.1"
