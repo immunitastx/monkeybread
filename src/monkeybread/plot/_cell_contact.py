@@ -14,6 +14,12 @@ def cell_contact_embedding(
     contacts: Dict[str, Set[str]],
     group: Optional[str] = None,
     basis: Optional[str] = "spatial",
+    contact_dot_size_group1: Optional[float] = None,
+    contact_dot_size_group2: Optional[float] = None,
+    non_contact_dot_size: Optional[float] = None,
+    contact_cell_color_group1: Optional[str] = "red",
+    contact_cell_color_group2: Optional[str] = "blue",
+    non_contact_cell_color: Optional[str] = "lightgrey",
     show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
     **kwargs,
@@ -47,14 +53,59 @@ def cell_contact_embedding(
     if ax is None:
         ax = plt.axes()
 
-    # Subset adata to only include contact cells
-    cell_list = set(contacts.keys())
+    # Subset adata to only include contact cells in first group
+    cell_list_g1 = set(contacts.keys())
+    adata_contact_g1 = adata[list(cell_list_g1)]
+
+    # Subset adata to only include contact cells in second group
+    cell_list_g2 = set()
     for s in contacts.values():
-        cell_list = cell_list.union(s)
-    mask = list(cell_list.intersection(adata.obs.index))
+        cell_list_g2 = cell_list_g2.union(s)
+    adata_contact_g2 = adata[list(cell_list_g2)]
 
-    mb.plot.embedding_filter(adata, mask=mask, group=group, basis=basis, show=False, ax=ax, **kwargs)
+    # Plot all cells in light gray
+    if non_contact_dot_size is None:
+        non_contact_dot_size = 12000 / adata.shape[0]
+    sc.pl.embedding(
+        adata, 
+        basis=basis, 
+        na_color=non_contact_cell_color, 
+        show=False, 
+        alpha=0.5, 
+        ax=ax, 
+        size=12000 / adata.shape[0], 
+        **kwargs
+    )
 
+    # Plot contact cells, optionally colored (otherwise red)
+    if contact_dot_size_group1 is None:
+        contact_dot_size_group1 = 12000 / adata.shape[0]
+    sc.pl.embedding(
+        adata_contact_g1,
+        basis=basis,
+        show=False,
+        ax=ax,
+        color=group,
+        na_color=contact_cell_color_group1,
+        alpha=1.0,
+        size=contact_dot_size_group1,
+        **kwargs,
+    )
+
+    if contact_dot_size_group2 is None:
+        contact_dot_size_group2 = 12000 / adata.shape[0]
+    sc.pl.embedding(
+        adata_contact_g2,
+        basis=basis,
+        show=False,
+        ax=ax,
+        color=group,
+        na_color=contact_cell_color_group2,
+        alpha=1.0,
+        size=contact_dot_size_group2,
+        **kwargs,
+    )
+    
     if show:
         plt.show()
     else:

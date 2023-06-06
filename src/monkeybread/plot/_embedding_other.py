@@ -7,7 +7,6 @@ from anndata import AnnData
 
 import monkeybread as mb
 
-
 def embedding_filter(
     adata: AnnData,
     mask: Union[List[bool], List[str]],
@@ -15,7 +14,11 @@ def embedding_filter(
     basis: Optional[str] = "spatial",
     show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
-    **kwargs,
+    masked_color: Optional[str] = "lightgrey",
+    masked_alpha: Optional[float] = 1.0,
+    masked_dot_size: Optional[float] = None,
+    unmasked_dot_size: Optional[float] = None,
+    **kwargs
 ) -> Optional[plt.Axes]:
     """Shows a filtered embedding, allowing for examination of specific cells.
 
@@ -51,9 +54,22 @@ def embedding_filter(
     # Subset adata to only include masked cells
     adata_sub = adata[mask]
 
+    # Calculate default dot sizes
+    if masked_dot_size is None:
+        masked_dot_size = 12000 / adata.shape[0]
+    if unmasked_dot_size is None:
+        unmasked_dot_size = (12000 / adata.shape[0]) * 5
+      
     # Plot all cells in light gray
     sc.pl.embedding(
-        adata, basis=basis, na_color="lightgrey", show=False, alpha=0.5, ax=ax, size=12000 / adata.shape[0], **kwargs
+        adata, 
+        basis=basis, 
+        na_color=masked_color, 
+        show=False, 
+        alpha=masked_alpha, 
+        ax=ax, 
+        size=masked_dot_size,
+        **kwargs
     )
 
     # Plot subset cells, optionally colored (otherwise red)
@@ -64,7 +80,7 @@ def embedding_filter(
         ax=ax,
         color=group,
         na_color="red",
-        size=(12000 / adata.shape[0]) * 5,
+        size=unmasked_dot_size,
         **kwargs,
     )
 
@@ -84,6 +100,10 @@ def embedding_zoom(
     mask: Optional[Union[List[bool], List[str]]] = None,
     basis: Optional[str] = "spatial",
     show: Optional[bool] = True,
+    unzoom_s: Optional[float] = None,
+    zoom_s: Optional[float] = None, 
+    axs: Optional[List[plt.Axes]] = None,
+    fig: Optional[plt.Figure] = None,
     **kwargs,
 ) -> Optional[plt.Figure]:
     """Shows embeddings of cells in contact with zoomed focus. Can be spatial or any other basis.
@@ -117,6 +137,10 @@ def embedding_zoom(
         Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     show
         Whether to show the plot or return the Axes object.
+    unzoom_s
+        Dot-size in the zoomed-out figure passed to :func:`scanpy.pl.embedding`.
+    zoom_s
+        Dot-size in the zoomed-in figure passed to :func:`scanpy.pl.embedding`.
     kwargs
         Keyword arguments that will be passed to :func:`scanpy.pl.embedding`.
 
@@ -128,13 +152,43 @@ def embedding_zoom(
     if not all([left_pct, top_pct, width_pct, height_pct]):
         raise ValueError("Must provide left_pct, top_pct, width_pct, height_pct")
 
-    # Set up plot structure and plot original data
-    fig, axs = plt.subplots(nrows=1, ncols=2)
-    if mask is not None:
-        embedding_filter(adata, mask, basis=basis, group=group, show=False, ax=axs[0], **kwargs)
+    # Add dot size to key-word arguments
+    if unzoom_s:
+        unzoom_kwargs = dict(kwargs, s=unzoom_s)
     else:
-        sc.pl.embedding(adata, basis=basis, color=group, show=False, ax=axs[0], **kwargs)
-    axs[0].get_legend().remove()
+        unzoom_kwargs = kwargs
+
+    if zoom_s:
+        zoom_kwargs = dict(kwargs, s=zoom_s)
+    else:
+        zoom_kwargs = kwargs
+
+    # Set up plot structure and plot original data
+    if axs is None:
+        fig, axs = plt.subplots(nrows=1, ncols=2)
+    if mask is not None:
+        embedding_filter(
+            adata, 
+            mask, 
+            basis=basis, 
+            group=group, 
+            show=False, 
+            ax=axs[0], 
+            **unzoom_kwargs
+        )
+    else:
+        sc.pl.embedding(
+            adata, 
+            basis=basis, 
+            color=group, 
+            show=False, 
+            ax=axs[0], 
+            **unzoom_kwargs
+        )
+    try:
+        axs[0].get_legend().remove()
+    except:
+        pass
 
     # Get scaling information and add rectangle
     left, right = axs[0].get_xlim()
@@ -144,7 +198,12 @@ def embedding_zoom(
     left_bound, zoom_width = (left + left_pct * tot_width, width_pct * tot_width)
     top_bound, zoom_height = (top - top_pct * tot_height, height_pct * tot_height)
     rect = mpl.patches.Rectangle(
-        (left_bound, top_bound - zoom_height), zoom_width, zoom_height, linewidth=1, edgecolor="black", facecolor="none"
+        (left_bound, top_bound - zoom_height), 
+        zoom_width, 
+        zoom_height, 
+        linewidth=1, 
+        edgecolor="black", 
+        facecolor="none"
     )
     axs[0].add_patch(rect)
 
@@ -163,12 +222,31 @@ def embedding_zoom(
     # Plot cell contact
     if mask is not None:
         zoom_mask = list(set(adata[mask].obs.index).intersection(set(zoom_adata.obs.index)))
-        embedding_filter(zoom_adata, zoom_mask, basis=basis, group=group, show=False, ax=axs[1], **kwargs)
+        embedding_filter(
+            zoom_adata, 
+            zoom_mask, 
+            basis=basis, 
+            group=group, 
+            show=False, 
+            ax=axs[1], 
+            **zoom_kwargs
+        )
     else:
-        sc.pl.embedding(zoom_adata, basis=basis, color=group, show=False, ax=axs[1], **kwargs)
+        sc.pl.embedding(
+            zoom_adata, 
+            basis=basis, 
+            color=group, 
+            show=False, 
+            ax=axs[1], 
+            **zoom_kwargs
+        )
 
     # Return fig or show
     if show:
         plt.show()
+        return zoom_adata
     else:
-        return fig
+        return zoom_adata, fig
+
+
+
