@@ -4,40 +4,41 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import scanpy as sc
 from anndata import AnnData
 
 import monkeybread as mb
 
 
-def cell_contact_embedding(
+def cell_neighbor_embedding(
     adata: AnnData,
-    contacts: Dict[str, Set[str]],
+    cell_to_neighbors: Dict[str, Set[str]],
     group: Optional[str] = None,
-    basis: Optional[str] = "spatial",
-    contact_dot_size_group1: Optional[float] = None,
-    contact_dot_size_group2: Optional[float] = None,
-    non_contact_dot_size: Optional[float] = None,
-    contact_cell_color_group1: Optional[str] = "red",
-    contact_cell_color_group2: Optional[str] = "blue",
-    non_contact_cell_color: Optional[str] = "lightgrey",
+    basis: Optional[str] = "X_spatial",
+    dot_size_group1: Optional[float] = None,
+    dot_size_group2: Optional[float] = None,
+    dot_size_unselected: Optional[float] = None,
+    cell_color_group1: Optional[str] = "red",
+    cell_color_group2: Optional[str] = "blue",
+    cell_color_unselected: Optional[str] = "lightgrey",
     show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
     **kwargs,
 ) -> Optional[plt.Axes]:
-    """Shows embeddings of cells in contact. Can be spatial or any other basis.
+    """Shows embeddings of cells with their neighbors.
 
-    Plots the results of :func:`monkeybread.calc.cell_contact`, highlighting the cells in contact.
+    Plots the results of :func:`monkeybread.calc.cell_neighbors`, highlighting the cells and their neighbors.
 
     Parameters
     ----------
     adata
         Annotated data matrix.
-    contacts
-        The actual cell contacts, as calculated by :func:`monkeybread.calc.cell_contact`.
+    cell_to_neighbors
+        Cells and their associated neighbors as calculated by :func:`monkeybread.calc.cell_neighbors`.
     group
-        Column in `adata.obs` to label cell contacts by.
+        Column in `adata.obs` for which to label cells.
     basis
-        Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
+        Coordinates in `adata.obsm[{basis}]` to use. Defaults to `X_spatial`.
     show
         Whether to show the plot or return the Axes object.
     ax
@@ -53,23 +54,23 @@ def cell_contact_embedding(
     if ax is None:
         ax = plt.axes()
 
-    # Subset adata to only include contact cells in first group
-    cell_list_g1 = set(contacts.keys())
-    adata_contact_g1 = adata[list(cell_list_g1)]
+    # Subset adata to only include cells in first group
+    cell_list_g1 = set(cell_to_neighbors.keys())
+    adata_group1 = adata[list(cell_list_g1)]
 
-    # Subset adata to only include contact cells in second group
+    # Subset adata to only include cells in second group
     cell_list_g2 = set()
-    for s in contacts.values():
+    for s in cell_to_neighbors.values():
         cell_list_g2 = cell_list_g2.union(s)
-    adata_contact_g2 = adata[list(cell_list_g2)]
+    adata_group2 = adata[list(cell_list_g2)]
 
     # Plot all cells in light gray
-    if non_contact_dot_size is None:
-        non_contact_dot_size = 12000 / adata.shape[0]
+    if dot_size_unselected is None:
+        dot_size_unselected = 12000 / adata.shape[0]
     sc.pl.embedding(
         adata, 
         basis=basis, 
-        na_color=non_contact_cell_color, 
+        na_color=cell_color_unselected, 
         show=False, 
         alpha=0.5, 
         ax=ax, 
@@ -77,32 +78,32 @@ def cell_contact_embedding(
         **kwargs
     )
 
-    # Plot contact cells, optionally colored (otherwise red)
-    if contact_dot_size_group1 is None:
-        contact_dot_size_group1 = 12000 / adata.shape[0]
+    # Plot cells, optionally colored (otherwise red)
+    if dot_size_group1 is None:
+        dot_size_group1 = 12000 / adata.shape[0]
     sc.pl.embedding(
-        adata_contact_g1,
+        adata_group1,
         basis=basis,
         show=False,
         ax=ax,
         color=group,
-        na_color=contact_cell_color_group1,
+        na_color=cell_color_group1,
         alpha=1.0,
-        size=contact_dot_size_group1,
+        size=dot_size_group1,
         **kwargs,
     )
 
-    if contact_dot_size_group2 is None:
-        contact_dot_size_group2 = 12000 / adata.shape[0]
+    if dot_size_group2 is None:
+        dot_size_group2 = 12000 / adata.shape[0]
     sc.pl.embedding(
-        adata_contact_g2,
+        adata_group2,
         basis=basis,
         show=False,
         ax=ax,
         color=group,
-        na_color=contact_cell_color_group2,
+        na_color=cell_color_group2,
         alpha=1.0,
-        size=contact_dot_size_group2,
+        size=dot_size_group2,
         **kwargs,
     )
     
