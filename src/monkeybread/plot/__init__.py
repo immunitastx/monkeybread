@@ -9,3 +9,4 @@ from ._embedding_other import embedding_filter, embedding_zoom
 from ._kernel_density import kernel_density, location_and_density
 from ._ligand_receptor import ligand_receptor_scatter
 from ._shortest_distances import shortest_distances, shortest_distances_pairwise
+from ._number_neighbors import number_of_neighbors
