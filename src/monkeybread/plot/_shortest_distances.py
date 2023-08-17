@@ -12,11 +12,13 @@ def shortest_distances(
     show: Optional[bool] = True,
     **kwargs,
 ) -> Union[plt.Axes, Tuple[plt.Axes, plt.Axes]]:
-    """Plot the distribution of observed distances from each cell in one group to its closest
-    cell of a second group as calculated by :func:`monkeybread.calc.shortest_distances`. 
+    """Plot the distribution of observed distances from each cell in one group (e.g., all T cells)
+    to its closest cell in a second group (e.g., all macrophages) as calculated by 
+    :func:`monkeybread.calc.shortest_distances`. 
 
     Optionally, also plot the null distribution of these distances under the null hypothesis 
-    that the two cell types do not co-locate as computed by :func:`monkeybread.stat.shortest_distances`.
+    that the two cell types do not co-locate. This null distribution must first be computed by 
+    :func:`monkeybread.stat.shortest_distances`.
 
     Parameters
     ----------
@@ -24,7 +26,7 @@ def shortest_distances(
         The observed shortest distances, as calculated by :func:`monkeybread.calc.shortest_distances`.
     expected_distances
         The expected distances  under the null hypothesis that the two cell types do not co-locate. 
-        Otional to include the distance threshold and p-value, as calculated by
+        Optional to include the distance threshold and p-value, as calculated by
         :func:`monkeybread.stat.shortest_distances`.
     show
         If true, displays the plot(s). If false, returns the Axes instead.
@@ -35,6 +37,16 @@ def shortest_distances(
     -------
     If `show = False`, returns nothing. Otherwise, returns a single Axes object or a tuple of
     two Axes objects if expected_distances is provided.
+
+    Example
+    -------
+
+    In the left-hand figure, we plot the distribution of distances between each cell in the first group
+    to its closest cell in the second group. The right-hand plot shows the expected distribution under 
+    the null hypothesis that cells do not co-locate. The vertical red line denotes the distance threshold
+    used to compute the test-statistic described by the p-value from :func:`monkeybread.stat.shortest_distances`.
+
+    .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/shortest_distances.png
     """
     # Set up plot structure
     ax = None
@@ -44,7 +56,13 @@ def shortest_distances(
         ax = axs[0]
 
     # Plot actual distances on first axis
-    ax = sns.histplot(observed_distances["distance"], ax=ax, legend=None, stat="density", **kwargs)
+    ax = sns.histplot(
+        observed_distances["distance"], 
+        ax=ax, 
+        legend=None, 
+        stat="density", 
+        **kwargs
+    )
     ax.set_title("Observed Shortest Distances")
 
     # Plot expected distances distribution on second axis if exists
@@ -55,7 +73,16 @@ def shortest_distances(
         max_y = max(axs[0].get_ylim(), axs[1].get_ylim())
         axs[0].set_ylim(max_y)
         axs[1].set_ylim(max_y)
-        x_bounds = min(axs[0].get_xlim()[0], axs[1].get_xlim()[0]), max(axs[0].get_xlim()[1], axs[1].get_xlim()[1])
+        x_bounds = (
+            min(
+                axs[0].get_xlim()[0], 
+                axs[1].get_xlim()[0]
+            ), 
+            max(
+                axs[0].get_xlim()[1], 
+                axs[1].get_xlim()[1]
+            )
+        )
         axs[0].set_xlim(x_bounds)
         axs[1].set_xlim(x_bounds)
         axs[0].set_xlabel("Distance")
@@ -74,7 +101,12 @@ def shortest_distances(
             threshold = expected_distances[1]
             threshold_line = axs[0].axvline(threshold, 0, 1.0, color="red", linestyle="--")
             axs[1].axvline(threshold, 0, 1.0, color="red", linestyle="--")
-            axs[0].legend(handles=[threshold_line], labels=["Threshold"], loc="center left", bbox_to_anchor=(1, 0.5))
+            axs[0].legend(
+                handles=[threshold_line], 
+                labels=["Threshold"], 
+                loc="center left", 
+                bbox_to_anchor=(1, 0.5)
+            )
         plt.tight_layout()
 
     if show:
@@ -92,8 +124,9 @@ def shortest_distances_pairwise(
         order_y: Optional[List[str]] = None,
         show: Optional[bool] = True,
         ax: Optional[plt.Axes] = None,
+        fig: Optional[plt.Figure] = None,
         **kwargs
-    ) ->  plt.Axes:
+    ) ->  Tuple[plt.Figure, plt.Axes]:
     """Plot a heatmap of the p-values calculated by :func:`monkeybread.stat.shortest_distances_pairwise`
     that is the result of testing the co-localization between every cell type in one set to every
     cell type in a second set (e.g., myeloid cell types to T cell subtypes).
@@ -120,6 +153,8 @@ def shortest_distances_pairwise(
         If True, show the plot and don't return the `plt.Axes` object.
     ax
         `plt.Axes` object to plot to
+    fig
+        `plt.Figure` object to plot to
     kwargs
         Keyword arguments to pass to :func:`seaborn.heatmap`.
 
@@ -154,7 +189,13 @@ def shortest_distances_pairwise(
 
     # Create heatmap
     if ax is None:
-        fig, ax = plt.subplots(1,1, figsize=(6,2))
+        fig, ax = plt.subplots(
+            1, 1, 
+            figsize=(
+                1.17*len(cell_types_x), 
+                2*len(cell_types_y)
+            )
+        )
     sns.heatmap(
         df_plot, 
         cmap=cmap, 
@@ -169,5 +210,5 @@ def shortest_distances_pairwise(
     if show:
         plt.show()
     else:
-        return ax
+        return fig, ax
 

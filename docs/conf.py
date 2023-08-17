@@ -16,15 +16,20 @@ sys.path.insert(0, str(HERE / "extensions"))
 
 # -- Project information -----------------------------------------------------
 
-info = metadata("monkeybread")
-project_name = info["Name"]
-author = info["Author"]
+#info = metadata("monkeybread")
+#project_name = info["Name"]
+project_name = "Monkeybread"
+#author = info["Author"]
+author = "Immunitas Therapeutics"
 copyright = f"{datetime.now():%Y}, {author}."
-version = info["Version"]
+#version = info["Version"]
+version = "1.0.0"
 repository_url = f"https://github.com/immunitastx/{project_name}"
 
+
 # The full version, including alpha/beta/rc tags
-release = info["Version"]
+#release = info["Version"]
+release = "1.0.0"
 
 bibtex_bibfiles = ["references.bib"]
 templates_path = ["_templates"]

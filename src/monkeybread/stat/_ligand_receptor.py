@@ -1,3 +1,10 @@
+"""
+Runs a statistical test testing for enrichment of ligand-receptor co-expression 
+between neighboring cells.
+
+Authors: Dillon Scott and Matthew Bernstein
+"""
+
 import itertools
 from typing import Dict, Optional, Set, Tuple
 
@@ -12,26 +19,31 @@ def ligand_receptor_score(
     contacts: Dict[str, Set[str]],
     actual_scores: Dict[Tuple[str, str], float],
     n_perms: Optional[int] = 100,
+    verbose: Optional[bool] = False
 ) -> Dict[Tuple[str, str], Tuple[np.ndarray, float]]:
-    """Calculates statistical significance of ligand-receptor pairs in contacting cells.
+    """Calculates statistical significance of the co-expression of
+    ligand-receptor pairs between neighboring cells.
 
-    Statistical test is as described in :cite:p:`He2021.11.03.467020`.
+    Statistical test is as described in :cite:p:`He2021.11.03.467020` (See 
+    Figure 4). This function runs this test separately on each ligand-receptor
+    pair among a set of pairs provided by the user.
 
     Parameters
     ----------
     adata
         Annotated data matrix.
     contacts
-        The cell contacts, as calculated by :func:`monkeybread.calc.cell_contact`.
+        A dictionary mapping each cell to its neighbors as calculated by :func:`monkeybread.calc.cell_contact`
     actual_scores
-        The observed scores, as calculated by :func:`monkeybread.calc.ligand_receptor_score`.
+        The observed co-expression scores as calculated by :func:`monkeybread.calc.ligand_receptor_score`
     n_perms
-        The number of permutations to run.
+        Number of permutations to run in the permutation test
 
     Returns
     -------
-    A mapping from ligand-receptor tuple pairs to a tuple containing the distribution of scores and
-    p-value.
+    A mapping from ligand-receptor tuple pairs to a tuple containing the distribution of co-expression 
+    scores under permutation (i.e., null distribution) with the associated p-value of the observed
+    co-expression score.
     """
     lr_pairs = list(actual_scores.keys())
 
@@ -46,16 +58,24 @@ def ligand_receptor_score(
 
     # Iterate over permutations
     for i in range(n_perms):
+        if verbose:
+            if i % 10 == 0:
+                print(f"Generating permutation {i+1}...")
+
         np.random.shuffle(receptor_cells)
         # Randomize linkages between ligand cells and receptor cells, pulling out the appropriate
-        # number of linkages for each ligand and recentor
+        # number of linkages for each ligand and receptor
         perm_i_lcell_to_rcells = {
             lcell: receptor_cells[idx_start : idx_start + len(rcells)]
             for (lcell, rcells), idx_start in zip(contacts.items(), ligand_index_starts)
         }
 
         # Use permutation "contact" to generate scores
-        perm_i_scores = mb.calc.ligand_receptor_score(adata, perm_i_lcell_to_rcells, lr_pairs=lr_pairs)
+        perm_i_scores = mb.calc.ligand_receptor_score(
+            adata, 
+            perm_i_lcell_to_rcells, 
+            lr_pairs=lr_pairs
+        )
 
         # Add scores to distributions
         for lr_pair, score in perm_i_scores.items():
@@ -69,7 +89,12 @@ def ligand_receptor_score(
 
     # Zip together distribution and p_vals
     lr_to_dist_pval = {
-        lr: (dist, pval) for lr, dist, pval in zip(actual_scores.keys(), lr_to_dist.values(), lr_to_pval.values())
+        lr: (dist, pval) 
+        for lr, dist, pval in zip(
+            actual_scores.keys(), 
+            lr_to_dist.values(), 
+            lr_to_pval.values()
+        )
     }
 
     return lr_to_dist_pval

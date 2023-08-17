@@ -1,3 +1,7 @@
+"""
+Visualization of ligand-receptor co-expression score between neighboring cells.
+"""
+
 from typing import Dict, List, Optional, Tuple, Union, Set
 
 import matplotlib as mpl
@@ -17,6 +21,14 @@ def _score_pairs(
         lr_pair,
         cell_to_neighbor
     ):
+    """
+    Helper function compute ligand-receptor co-expression score between
+    neighboring cells.
+
+    The ligand-receptor score is described in :cite:p:`He2021.11.03.467020`.
+    For a given pair of cells, it is expressed as `sqrt(l*r)` where `l` is the
+    expression of the ligand and `r` is the expression of the receptor.
+    """
     # Convert cell_to_neighbors dictionary to list of cell_id tuples
     neighbor_pairs = np.array(
         list(
@@ -60,15 +72,14 @@ def ligand_receptor_embedding(
     show: Optional[bool] = True,
     **kwargs
 ) -> Dict[Tuple[str, str], float]:
-    """For a given mapping of cells to their neighbors and a given 
-    ligand-receptor pair, calculate and plot a ligand-receptor co-expression 
-    score between each pair of cells that are neighbors. A line is drawn
-    between each pair of neighboring cells colored by their ligand-receptor
-    co-expression score.
+    """Plot the ligand-receptor co-expression score between pairs of neighboring cells.
+    A line is drawn between each pair of neighbors cells where that 
+    line is colored according to the magnitude of their ligand-receptor co-expression 
+    score.
 
     The ligand-receptor score is described in :cite:p:`He2021.11.03.467020`.
-    For a given pair of cells, it is expressed as `sqrt(l*r)` where l is the 
-    expression of the ligand and r is the expression of the receptor.
+    For a given pair of cells, it is expressed as `sqrt(l*r)` where `l` is the 
+    expression of the ligand and `r` is the expression of the receptor.
 
     Parameters
     ----------
@@ -84,17 +95,17 @@ def ligand_receptor_embedding(
     color
         Column in `adata.obs` used to color cells.
     basis
-        Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`. 
+        Coordinates in `adata.obsm[{basis}]` to use. Defaults to `spatial`. 
     palette
         Palette used to color cells
     cmap_name
         Colormap used to color lines connecting cells to their neighbors
     encode_lw
-        Encode ligand-receptor score in the line-width connecting each cell to its neighbor. A pair
-        of cells with a low ligand-receptor co-expression score will be connected by a thin line
-        whereas a pair of cells with a high ligand-receptor co-expression score will be connected
-        by a thick line. If `False`, all lines will have the same line thickness defined by the
-        `max_lw` argument.
+        Draw the width of each line connecting neighboring cells according to the magnitude of their 
+        ligand-receptor score. Neighboring cells with a low ligand-receptor co-expression score will 
+        be connected by a thinly drawn line whereas a pair of cells with a high ligand-receptor 
+        co-expression score will be connected by a thickly drawn line. If `False`, all lines will be drawn 
+        with equal thickness defined by the `max_lw` argument.
     max_lw
         If `encode_lw = True`, this is thickness of the line connecting the pair of cells with
         maximum ligand-receptor score. If `encode_lw = False`, this is the thickness connecting
@@ -111,6 +122,11 @@ def ligand_receptor_embedding(
     -------
     If `show = True`, returns nothing. Otherwise, returns the Figure and Axes containing
     the figure.
+
+    Example
+    -------
+
+    .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/ligand_receptor_embedding.png
     """
     # Score each neighbor pair for ligand-receptor expression
     pairs_w_scores = _score_pairs(
@@ -215,18 +231,17 @@ def ligand_receptor_embedding_zoom(
     show: Optional[bool] = True,
     **kwargs
 ) -> Union[Tuple[plt.Figure, plt.Axes], None]:
-    """For a given mapping of cells to their neighbors and a given 
-    ligand-receptor pair, calculate and plot a ligand-receptor co-expression 
-    score between each pair of cells that are neighbors. A line is drawn
-    between each pair of neighboring cells colored by their ligand-receptor
-    co-expression score.
+    """Plot the ligand-receptor co-expression score between pairs of neighboring cells. 
+    A line is drawn between each pair of neighbors cells where that 
+    line is colored according to the magnitude of their ligand-receptor co-expression 
+    score.
 
     The ligand-receptor score is described in :cite:p:`He2021.11.03.467020`.
-    For a given pair of cells, it is expressed as `sqrt(l*r)` where l is the 
-    expression of the ligand and r is the expression of the receptor.
+    For a given pair of cells, it is expressed as `sqrt(l*r)` where `l` is the 
+    expression of the ligand and `r` is the expression of the receptor.
 
-    This function plots the full tissue slice as well as a zoomed-in area
-    of this tissue-slice specified by the user.
+    This function plots the full tissue slice as well as a specified zoomed-in 
+    region of the tissue by calling :func:`monkeybread.plot.embedding_zoom`.
 
     Parameters
     ----------
@@ -242,29 +257,29 @@ def ligand_receptor_embedding_zoom(
     color
         Column in `adata.obs` used to color cells.
     basis
-        Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
+        Coordinates in `adata.obsm[{basis}]` to use. Defaults to `spatial`.
     left_pct
-        The fraction of the plot width to use as the left bound of the zoomed-in rectangle, e.g. 0.1
-        represents 10% from the left of the plot.
+        The fraction of the plot width to use as the left bound of the zoomed-in rectangle (e.g. 0.1
+        represents 10% from the left of the plot)
     top_pct
-        The fraction of the plot height to use as the upper bound of the zoomed-in rectangle, e.g.
-        0.3 represents 30% from the top of the plot.
+        The fraction of the plot height to use as the upper bound of the zoomed-in rectangle (e.g.
+        0.3 represents 30% from the top of the plot)
     width_pct
-        The fraction of the plot width to use for the zoomed-in rectangle, e.g. 0.5 represents a
-        width half of the original plot.
+        The fraction of the plot width to use for the zoomed-in rectangle (e.g., 0.5 represents a
+        width half of the original plot)
     height_pct
-        The fraction of the plot height to use for the zoomed-in rectangle, e.g. 0.25 represents a
-        height 25% of the original plot.
+        The fraction of the plot height to use for the zoomed-in rectangle (e.g., 0.25 represents a
+        height 25% of the original plot)
     palette
         Palette used to color cells
     cmap_name
         Colormap used to color lines connecting cells to their neighbors
     encode_lw
-        Encode ligand-receptor score in the line-width connecting each cell to its neighbor. A pair
-        of cells with a low ligand-receptor co-expression score will be connected by a thin line
-        whereas a pair of cells with a high ligand-receptor co-expression score will be connected 
-        by a thick line. If `False`, all lines will have the same line thickness defined by the 
-        `max_lw` argument.
+        Draw the width of each line connecting neighboring cells according to the magnitude of their 
+        ligand-receptor score. Neighboring cells with a low ligand-receptor co-expression score will 
+        be connected by a thinly drawn line whereas a pair of cells with a high ligand-receptor 
+        co-expression score will be connected by a thickly drawn line. If `False`, all lines will be drawn 
+        with equal thickness defined by the `max_lw` argument.
     max_lw
         If `encode_lw = True`, this is thickness of the line connecting the pair of cells with 
         maximum ligand-receptor score. If `encode_lw = False`, this is the thickness connecting
@@ -280,7 +295,12 @@ def ligand_receptor_embedding_zoom(
     Returns
     -------
     If `show = True`, returns nothing. Otherwise, returns the Figure and Axes containing
-    the figure.
+    the figure
+
+    Example
+    -------
+
+    .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/ligand_receptor_score_embedding_zoom.png
     """
     # Score each neighbor pair for ligand-receptor expression
     pairs_w_scores = _score_pairs(

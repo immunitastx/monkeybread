@@ -24,7 +24,7 @@ def _create_colormap(color1, color2, num_steps=100, show=False):
     return cmap
 
 
-def kernel_density(
+def cell_density(
     adata: Union[AnnData, pd.Series, Dict[str, pd.Series]],
     key: Union[str, Dict[str, str]],
     spot_size: Optional[float] = None,
@@ -36,17 +36,17 @@ def kernel_density(
     ax: Optional[plt.Axes] = None,
 ) -> Optional[Union[plt.Figure, plt.Axes]]:
     """Plots the spatial density of cells across the tissue, as calculated by 
-    :func:`monkeybread.calc.kernel_density`, using :func:`scanpy.pl.embedding`.
+    :func:`monkeybread.calc.cell_density`.
 
     Parameters
     ----------
     adata
-        Annotated data matrix.
+        Annotated data matrix
     key
         Either a key in `adata.obs` or a mapping of group names to keys in `adata.obs` corresponding
-        to density columns.
+        to density columns
     spot_size
-        The size of spots to plot.
+        The size of spots to plot
     alpha
         The alpha blending value, between 0 (transparent) and 1 (opaque).
     cmap
@@ -65,6 +65,10 @@ def kernel_density(
     plot
         If `show = False` returns the current figure (if `key` is a mapping) or the current axes
         (if `key` is a string). If `show = True` returns nothing.
+
+    Example
+    -------
+    .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/kernel_density.png
     """
     if type(key) == dict:
         # Set up subplot dimensions (max columns 4)
@@ -74,7 +78,7 @@ def kernel_density(
         for (index, (category, column)) in enumerate(key.items()):
             # Plot recursively for each column calculated
             axs = plt.subplot(nrows, ncols, index + 1)
-            kernel_density(
+            cell_density(
                 adata,
                 key=column,
                 spot_size=spot_size,
@@ -128,13 +132,15 @@ def location_and_density(
     title: Optional[str] = None,
     grid: Optional[bool] = True,
     n_grids: Optional[int] = 5,
+    palette: Optional[List[str]] = None,
     delete_temp_columns: Optional[bool] = False,
     show: Optional[bool] = True
 ) -> Union[None, Tuple[plt.Figure, List[plt.Axes]]]:
     """
-    A wrapper around both :func:`scanpy.pl.embedding` and :func:`monkeybread.calc.kernel_density` that 
-    creates figures side-by-side showing both the raw location of cells of a given cell type and their
-    density across the tissue.
+    A wrapper around both :func:`scanpy.pl.embedding` and :func:`monkeybread.calc.cell_density` that 
+    creates multi-panel figures showing both the raw location of cells of a given cell type, by calling
+    :func:`scanpy.pl.embedding` and their density across the tissue by calling 
+    :func:`monkeybread.calc.cell_density`.
 
     Parameters
     ----------
@@ -159,20 +165,14 @@ def location_and_density(
         each group with a different dot size, a list of sizes can be provided.
     na_dot_size
         The size of dots in the embedding for cells that are not of interest (specified in `groups`)
-    alpha
-        The alpha blending value, between 0 (transparent) and 1 (opaque).
-    cmap
-        Colormap to use for values 0 to 1
-    show_legend
-        If `True` show the legend. Otherwise, hide it.
-    show
-        Whether to show the plot or return it
     title
         Title of the first figure showing the embedding of all of the cells together in one plot.
     grid
         If `True`, draw grid lines in each plot
     n_grids
         Number of gridlines to be drawn if `grid` is `True`
+    palette
+        Color palette used to color each group
     delete_temp_columns
         Delete columns added to `adata.obs` that were added during the creation of these plots.
     show
@@ -184,6 +184,12 @@ def location_and_density(
         If `show = False` returns the current figure and axes.
         If `show = True` returns nothing.
 
+    Example
+    -------
+    The left-most figure displays the locations of B cells (red) and CD4 Tfh cells (blue) in the tissue. The center
+    and right-most figures display the density of B cells and CD4 Tfh cells, respectively, across the tissue.
+
+    .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/location_and_density.png
     """
 
     if type(groups) == str:
@@ -201,31 +207,32 @@ def location_and_density(
         fig, ax = plt.subplots(1, 1, figsize=(3,3))
         axarr = [ax]
 
-    palette = [
-        "#0652ff", #  electric blue
-        "#e50000", #  red
-        "#9a0eea", #  violet
-        "#01b44c", #  shamrock
-        "#fedf08", #  dandelion
-        "#00ffff", #  cyan
-        "#89fe05", #  lime green
-        "#a2cffe", #  baby blue
-        "#dbb40c", #  gold
-        "#029386", #  teal
-        "#ff9408", #  tangerine
-        "#d8dcd6", #  light grey
-        "#80f9ad", #  seafoam
-        "#3d1c02", #  chocolate
-        "#fffd74", #  butter yellow
-        "#536267", #  gunmetal
-        "#f6cefc", #  very light purple
-        "#650021", #  maroon
-        "#020035", #  midnight blue
-        "#b0dd16", #  yellowish green
-        "#9d7651", #  mocha
-        "#c20078", #  magenta
-        "#380282", #  indigo
-    ]
+    if palette is None:
+        palette = [
+            "#0652ff", #  electric blue
+            "#e50000", #  red
+            "#9a0eea", #  violet
+            "#01b44c", #  shamrock
+            "#fedf08", #  dandelion
+            "#00ffff", #  cyan
+            "#89fe05", #  lime green
+            "#a2cffe", #  baby blue
+            "#dbb40c", #  gold
+            "#029386", #  teal
+            "#ff9408", #  tangerine
+            "#d8dcd6", #  light grey
+            "#80f9ad", #  seafoam
+            "#3d1c02", #  chocolate
+            "#fffd74", #  butter yellow
+            "#536267", #  gunmetal
+            "#f6cefc", #  very light purple
+            "#650021", #  maroon
+            "#020035", #  midnight blue
+            "#b0dd16", #  yellowish green
+            "#9d7651", #  mocha
+            "#c20078", #  magenta
+            "#380282", #  indigo
+        ]
     for group_i, (group, groupname, color, d_size) in enumerate(zip(groups, groupnames, palette, dot_size)):
         ct_to_in_group = {
             ct: str(ct in group)
@@ -307,7 +314,7 @@ def location_and_density(
         ]
 
         for group_i, (group, groupname, cmap, ax) in enumerate(zip(groups, groupnames, cmaps, axarr[1:])):
-            mb.calc.kernel_density(
+            mb.calc.cell_density(
                 adata,
                 groupby=f'is_{groupname}',
                 groups='True',
@@ -315,7 +322,7 @@ def location_and_density(
                 bandwidth=75.
             )
             alpha=1.0
-            kernel_density(
+            cell_density(
                 adata,
                 key=f'is_{groupname}_density_True',
                 cmap=cmaps[group_i],

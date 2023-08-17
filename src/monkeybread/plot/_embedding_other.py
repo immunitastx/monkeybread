@@ -10,7 +10,7 @@ import monkeybread as mb
 def embedding_filter(
     adata: AnnData,
     mask: Union[List[bool], List[str]],
-    group: Optional[str] = None,
+    color: Optional[str] = None,
     basis: Optional[str] = "spatial",
     show: Optional[bool] = True,
     ax: Optional[plt.Axes] = None,
@@ -22,7 +22,7 @@ def embedding_filter(
 ) -> Optional[plt.Axes]:
     """Shows a filtered embedding, allowing for examination of specific cells.
 
-    Cells in the mask will be larger and colored based on `group` if provided, otherwise red. Cells
+    Cells in the mask will be larger and colored based on `color` if provided, otherwise red. Cells
     not in the mask will be smaller and colored gray.
 
     Parameters
@@ -32,8 +32,8 @@ def embedding_filter(
     mask
         A mask to apply to `adata.obs.index`. Can be a list of cell indices or a boolean mask with
         the same length as the index.
-    group
-        Column in `adata.obs` or `adata.var_names` to label cell contacts by.
+    color
+        Column in `adata.obs` or `adata.var_names` used to color cells.
     basis
         Coordinates in `adata.obsm[X_{basis}]` to use. Defaults to `spatial`.
     show
@@ -66,9 +66,10 @@ def embedding_filter(
         basis=basis, 
         na_color=masked_color, 
         show=False, 
-        alpha=masked_alpha, 
+        alpha=masked_alpha,
         ax=ax, 
         size=masked_dot_size,
+        colorbar_loc=None,
         **kwargs
     )
 
@@ -78,7 +79,7 @@ def embedding_filter(
         basis=basis,
         show=False,
         ax=ax,
-        color=group,
+        color=color,
         na_color="red",
         size=unmasked_dot_size,
         **kwargs,
@@ -96,7 +97,7 @@ def embedding_zoom(
     top_pct: float = None,
     width_pct: float = None,
     height_pct: float = None,
-    group: Optional[str] = None,
+    color: Optional[str] = None,
     mask: Optional[Union[List[bool], List[str]]] = None,
     basis: Optional[str] = "spatial",
     show: Optional[bool] = True,
@@ -128,8 +129,8 @@ def embedding_zoom(
     height_pct
         The fraction of the plot height to use for the zoomed-in rectangle, e.g. 0.25 represents a
         height 25% of the original plot.
-    group
-        Column in `adata.obs` to label cell contacts by.
+    color
+        Column in `adata.obs` used to color cells.
     mask
         A mask to apply to `adata.obs.index`. Can be a list of cell indices or a boolean mask with
         the same length as the index, as described in :func:`monkeybread.plot.embedding_filter`.
@@ -148,6 +149,11 @@ def embedding_zoom(
     -------
     If `show = True`, returns nothing. Otherwise, returns the Figure object the plots are contained
     within.
+
+    Example
+    -------
+
+    .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/embedding_zoom.png
     """
     if not all([left_pct, top_pct, width_pct, height_pct]):
         raise ValueError("Must provide left_pct, top_pct, width_pct, height_pct")
@@ -171,7 +177,7 @@ def embedding_zoom(
             adata, 
             mask, 
             basis=basis, 
-            group=group, 
+            color=color, 
             show=False, 
             ax=axs[0], 
             **unzoom_kwargs
@@ -180,7 +186,7 @@ def embedding_zoom(
         sc.pl.embedding(
             adata, 
             basis=basis, 
-            color=group, 
+            color=color, 
             show=False, 
             ax=axs[0], 
             **unzoom_kwargs
@@ -226,7 +232,7 @@ def embedding_zoom(
             zoom_adata, 
             zoom_mask, 
             basis=basis, 
-            group=group, 
+            color=color, 
             show=False, 
             ax=axs[1], 
             **zoom_kwargs
@@ -235,7 +241,7 @@ def embedding_zoom(
         sc.pl.embedding(
             zoom_adata, 
             basis=basis, 
-            color=group, 
+            color=color,
             show=False, 
             ax=axs[1], 
             **zoom_kwargs

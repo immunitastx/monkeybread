@@ -1,3 +1,6 @@
+"""
+Statistical tests for cellular co-localization.
+"""
 import random as rand
 from collections import Counter
 from typing import List, Optional, Tuple, Union, Dict
@@ -136,7 +139,6 @@ def shortest_distances_pairwise(
     statistics: the number of shortest distances from cells in each `group1` cell type to 
     cells in each `group2` cell type that are less than `threshold`.
     
-
     Parameters
     ----------
     adata
