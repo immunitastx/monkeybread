@@ -4,7 +4,7 @@ import monkeybread as mb
 
 
 def test_ligand_receptor_score(sample_with_expression):
-    contacts = mb.calc.cell_contact(sample_with_expression, groupby="cell_type", group1="ct1", group2="ct2", radius=1)
+    contacts = mb.calc.cell_neighbors(sample_with_expression, groupby="cell_type", group1="ct1", group2="ct2", radius=1)
     lr_scores = mb.calc.ligand_receptor_score(sample_with_expression, contacts, [("A", "B"), ("A", "C")])
 
     expected_ab_score = np.sum(np.sqrt([i * i for i in range(10)])) / 10
@@ -15,7 +15,7 @@ def test_ligand_receptor_score(sample_with_expression):
 
 
 def test_ligand_receptor_score_insignificance(sample_with_expression):
-    contacts = mb.calc.cell_contact(sample_with_expression, groupby="cell_type", group1="ct1", group2="ct2", radius=1)
+    contacts = mb.calc.cell_neighbors(sample_with_expression, groupby="cell_type", group1="ct1", group2="ct2", radius=1)
     lr_scores = mb.calc.ligand_receptor_score(sample_with_expression, contacts, ("A", "C"))
     lr_stat_scores = mb.stat.ligand_receptor_score(sample_with_expression, contacts, lr_scores, n_perms=1000)
 
@@ -23,7 +23,7 @@ def test_ligand_receptor_score_insignificance(sample_with_expression):
 
 
 def test_ligand_receptor_score_significance(sample_with_expression):
-    contacts = mb.calc.cell_contact(sample_with_expression, groupby="cell_type", group1="ct1", group2="ct2", radius=1)
+    contacts = mb.calc.cell_neighbors(sample_with_expression, groupby="cell_type", group1="ct1", group2="ct2", radius=1)
     lr_scores = mb.calc.ligand_receptor_score(sample_with_expression, contacts, ("A", "B"))
     lr_stat_scores = mb.stat.ligand_receptor_score(sample_with_expression, contacts, lr_scores, n_perms=1000)
 
