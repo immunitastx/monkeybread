@@ -26,7 +26,7 @@ def test_shortest_distance_dense_ct2_ct1(dense_sample):
 def test_shortest_distance_dense_ct1_ct2_insignificance(dense_sample):
     shortest_distances = mb.calc.shortest_distances(dense_sample, "cell_type", "ct1", "ct2")
     expected_distances, threshold, p_val = mb.stat.shortest_distances(
-        dense_sample, "cell_type", "ct1", "ct2", actual=shortest_distances, threshold=2
+        dense_sample, "cell_type", "ct1", "ct2", observed=shortest_distances, threshold=2
     )
     assert threshold == 2
     assert p_val == 1.0  # Only 2 cell types, so permutation does not change labels
@@ -35,7 +35,7 @@ def test_shortest_distance_dense_ct1_ct2_insignificance(dense_sample):
 
 def test_shortest_distance_dense_ct1_ct2_no_threshold(dense_sample):
     shortest_distances = mb.calc.shortest_distances(dense_sample, "cell_type", "ct1", "ct2")
-    expected_distances = mb.stat.shortest_distances(dense_sample, "cell_type", "ct1", "ct2", actual=shortest_distances)
+    expected_distances = mb.stat.shortest_distances(dense_sample, "cell_type", "ct1", "ct2", observed=shortest_distances)
     assert np.allclose(expected_distances, np.tile(shortest_distances["distance"], 100))
 
 
@@ -62,7 +62,7 @@ def test_shortest_distance_sparse_ct2_ct1(sparse_sample):
 def test_shortest_distance_sparse_ct1_ct2_insignificance(sparse_sample):
     shortest_distances = mb.calc.shortest_distances(sparse_sample, "cell_type", "ct1", "ct2")
     expected_distances, threshold, p_val = mb.stat.shortest_distances(
-        sparse_sample, "cell_type", "ct1", "ct2", actual=shortest_distances, threshold=5
+        sparse_sample, "cell_type", "ct1", "ct2", observed=shortest_distances, threshold=5
     )
     assert threshold == 5
     assert p_val == 1.0  # Only 2 cell types, so permutation does not change labels
@@ -82,7 +82,7 @@ def test_shortest_distance_ct3_ct1(ct3_sample):
 def test_shortest_distance_ct3_ct1_significance(ct3_sample):
     shortest_distances = mb.calc.shortest_distances(ct3_sample, "cell_type", "ct3", "ct1")
     expected_distances, threshold, p_val = mb.stat.shortest_distances(
-        ct3_sample, "cell_type", "ct3", "ct1", actual=shortest_distances, threshold=1, n_perms=1000
+        ct3_sample, "cell_type", "ct3", "ct1", observed=shortest_distances, threshold=1, n_perms=1000
     )
     assert threshold == 1
     assert p_val < 0.20
@@ -91,7 +91,7 @@ def test_shortest_distance_ct3_ct1_significance(ct3_sample):
 def test_shortest_distance_ct1_ct3_insignificance(ct3_sample):
     shortest_distances = mb.calc.shortest_distances(ct3_sample, "cell_type", "ct1", "ct3")
     expected_distances, threshold, p_val = mb.stat.shortest_distances(
-        ct3_sample, "cell_type", "ct1", "ct3", actual=shortest_distances, threshold=1, n_perms=1000
+        ct3_sample, "cell_type", "ct1", "ct3", observed=shortest_distances, threshold=1, n_perms=1000
     )
     assert threshold == 1
     assert p_val > 0.50
