@@ -12,6 +12,8 @@ Monkeybread provides tools that enable:
 
 Monkeybread operates on datasets stored as [AnnData](https://anndata.readthedocs.io/en/latest/) and thus, can be integrated into analyses that use packages from the [sc-verse](https://scverse.org/) such as [scanpy](https://scanpy.readthedocs.io/en/latest/) or [squidpy](https://squidpy.readthedocs.io/en/stable/).
 
+Monkeybread was developed at [Immunitas Therapeutics](https://www.immunitastx.com/). 
+
 ## Installation
 
 To install Monkeybread using pip, run the following command:
