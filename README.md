@@ -10,7 +10,7 @@ Monkeybread provides tools that enable:
 * Statistical tests for testing for colocalization between cell types
 * Statistical tests and visualiziation for ligand-receptor co-expression between neighboring cells
 
-Monkeybread operates on datasets stored as [AnnData](https://anndata.readthedocs.io/en/latest/) and thus, can be integrated into analyses that use packages from the [sc-verse](https://scverse.org/) such as [scanpy](https://scanpy.readthedocs.io/en/latest/) or [squidpy](https://squidpy.readthedocs.io/en/stable/).
+Monkeybread operates on datasets stored as [AnnData](https://anndata.readthedocs.io/en/latest/) objects and thus, can be integrated into analyses that use packages from the [scverse](https://scverse.org/) such as [scanpy](https://scanpy.readthedocs.io/en/latest/) or [squidpy](https://squidpy.readthedocs.io/en/stable/).
 
 Monkeybread was developed at [Immunitas Therapeutics](https://www.immunitastx.com/). 
 
