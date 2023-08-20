@@ -15,11 +15,16 @@ import monkeybread as mb
 .. autosummary::
     :toctree: generated
 
-    calc.cell_density
-    calc.cell_transcript_proximity
-    calc.shortest_distances
+    calc.cellular_niches
     calc.neighborhood_profile
+    calc.cell_density
     calc.ligand_receptor_score
+    calc.shortest_distances
+    calc.shortest_distances_pairwise
+    calc.cell_neighbors
+    calc.cell_neighbors_from_masks
+    calc.number_of_neighbors
+    calc.number_of_neighbors_from_masks
 ```
 
 ## Plotting: `plot`
@@ -35,6 +40,7 @@ import monkeybread as mb
     plot.location_and_density
     plot.shortest_distances
     plot.shortest_distances_pairwise
+    plot.cell_neighbor_embedding
     plot.embedding_filter
     plot.embedding_zoom
     plot.ligand_receptor_scatter
@@ -51,7 +57,6 @@ import monkeybread as mb
 .. autosummary::
     :toctree: generated
 
-    stat.cell_contact
     stat.shortest_distances
     stat.ligand_receptor_score
 ```
