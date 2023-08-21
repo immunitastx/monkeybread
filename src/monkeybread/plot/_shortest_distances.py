@@ -122,6 +122,7 @@ def shortest_distances_pairwise(
         fmt: Optional[str] = '.2f',
         order_x: Optional[List[str]] = None,
         order_y: Optional[List[str]] = None,
+        figsize: Optional[Tuple[float, float]] = None,
         show: Optional[bool] = True,
         ax: Optional[plt.Axes] = None,
         fig: Optional[plt.Figure] = None,
@@ -149,6 +150,8 @@ def shortest_distances_pairwise(
     order_y
         Order of labels along the y-axis (keys of the outer-dictionary within the `g1_to_g2_to_pval`
         argument.
+    figsize
+        Dimensions of figure
     show
         If True, show the plot and don't return the `plt.Axes` object.
     ax
@@ -188,13 +191,15 @@ def shortest_distances_pairwise(
     )
 
     # Create heatmap
+    if not figsize:
+        figsize=(
+            1.17*len(cell_types_x),
+            2*len(cell_types_y)
+        )
     if ax is None:
         fig, ax = plt.subplots(
             1, 1, 
-            figsize=(
-                1.17*len(cell_types_x), 
-                2*len(cell_types_y)
-            )
+            figsize=figsize
         )
     sns.heatmap(
         df_plot, 

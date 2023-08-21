@@ -17,7 +17,6 @@ default_paths = {
 
 def load_merscope(
     folder: Optional[str] = ".",
-    use_cache: Optional[str] = None,
     transcript_locations: Optional[bool] = None,
     paths: Optional[Dict[str, str]] = None,
 ) -> ad.AnnData:
@@ -46,23 +45,15 @@ def load_merscope(
 
     data: ad.AnnData
 
-    if use_cache is not None:
-        if use_cache == "all":
-            return ad.read(f"{folder}/{paths['cache']}")
-        elif use_cache == "spatial":
-            data = ad.read(f"{folder}/{paths['cache']}")
-        else:
-            raise ValueError("use_cache must be None, 'all', or 'spatial'")
-    else:
-        # If cached data doesn't exist, read gene expression and basic spatial data
-        counts = sc.read(f"{folder}/{paths['counts']}", first_column_names=True, cache=True)
-        coordinates = pd.read_csv(f"{folder}/{paths['coordinates']}")
-        coordinates = coordinates.rename({"Unnamed: 0": "cell_id"}, axis=1)
-        data = counts[coordinates.cell_id]  # Slice data by coordinate index
-        data.obsm["X_spatial"] = coordinates[["center_x", "center_y"]].to_numpy()
-        data.obs["width"] = coordinates["max_x"].to_numpy() - coordinates["min_x"].to_numpy()
-        data.obs["height"] = coordinates["max_y"].to_numpy() - coordinates["min_y"].to_numpy()
-        data.obs["fov"] = coordinates["fov"].to_numpy()
+    counts = sc.read(f"{folder}/{paths['counts']}", first_column_names=True, cache=True)
+    coordinates = pd.read_csv(f"{folder}/{paths['coordinates']}")
+    coordinates = coordinates.rename({"Unnamed: 0": "cell_id"}, axis=1)
+    data = counts[coordinates.cell_id]  # Slice data by coordinate index
+    data.obsm["X_spatial"] = coordinates[["center_x", "center_y"]].to_numpy()
+    data.obs["width"] = coordinates["max_x"].to_numpy() - coordinates["min_x"].to_numpy()
+    data.obs["height"] = coordinates["max_y"].to_numpy() - coordinates["min_y"].to_numpy()
+    data.obs["fov"] = coordinates["fov"].to_numpy()
+    data.obs.index = [str(x) for x in  data.obs.index] # Ensure cell indices are strings
 
     # Read transcripts
     if transcript_locations or (transcript_locations is None and os.path.exists(f"{folder}/{paths['transcripts']}")):

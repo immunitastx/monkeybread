@@ -158,6 +158,12 @@ def embedding_zoom(
     if not all([left_pct, top_pct, width_pct, height_pct]):
         raise ValueError("Must provide left_pct, top_pct, width_pct, height_pct")
 
+    # Place in units of fractions rather than percents
+    left_pct /= 100
+    top_pct /= 100
+    width_pct /= 100 
+    height_pct /= 100
+
     # Add dot size to key-word arguments
     if unzoom_s:
         unzoom_kwargs = dict(kwargs, s=unzoom_s)

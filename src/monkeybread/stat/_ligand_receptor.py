@@ -7,7 +7,7 @@ Authors: Dillon Scott and Matthew Bernstein
 
 import itertools
 from typing import Dict, Optional, Set, Tuple
-
+from tqdm import tqdm
 import numpy as np
 from anndata import AnnData
 
@@ -18,8 +18,7 @@ def ligand_receptor_score(
     adata: AnnData,
     contacts: Dict[str, Set[str]],
     actual_scores: Dict[Tuple[str, str], float],
-    n_perms: Optional[int] = 100,
-    verbose: Optional[bool] = False
+    n_perms: Optional[int] = 100
 ) -> Dict[Tuple[str, str], Tuple[np.ndarray, float]]:
     """Calculates statistical significance of the co-expression of
     ligand-receptor pairs between neighboring cells.
@@ -57,11 +56,7 @@ def ligand_receptor_score(
     ligand_index_starts = np.array([0] + list(itertools.accumulate(len(v) for v in contacts.values())))
 
     # Iterate over permutations
-    for i in range(n_perms):
-        if verbose:
-            if i % 10 == 0:
-                print(f"Generating permutation {i+1}...")
-
+    for i in tqdm(range(n_perms)):
         np.random.shuffle(receptor_cells)
         # Randomize linkages between ligand cells and receptor cells, pulling out the appropriate
         # number of linkages for each ligand and receptor

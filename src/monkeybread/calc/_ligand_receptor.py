@@ -81,3 +81,4 @@ def ligand_receptor_score(
     lr_pair_to_score = {(ligand, receptor): calculate_score(ligand, receptor) for ligand, receptor in lr_pairs}
 
     return lr_pair_to_score
+
