@@ -130,7 +130,7 @@ nitpick_ignore = [
     # you can add an exception to this list.
     #     ("py:class", "igraph.Graph"),
     ('py:class', 'seaborn.matrix.ClusterGrid'),
-    ('py.func', 'omnipath.interactions.import_intercell_network')
+    ('py:func', 'omnipath.interactions.import_intercell_network')
 ]
 
 

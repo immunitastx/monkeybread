@@ -88,7 +88,7 @@ def ligand_receptor_score_per_niche(
     lr_pairs: Optional[Union[Tuple[str, str], List[Tuple[str, str]]]] = None,
 ) -> Dict[str, Dict[Tuple[str, str], float]]:
     """
-     Calculates an average co-expression score of a
+    Calculates an average co-expression score of a
     ligand-receptor pair between neighboring cells within each cellular niche
     calculated by :func:`monkeybread.calc.cellular_niches`. Statistical test is as described 
     in :cite:p:`He2021.11.03.467020` (See Figure 4). This function is a wrapper around 
