@@ -90,13 +90,10 @@ def ligand_receptor_score_per_niche(
     """
      Calculates an average co-expression score of a
     ligand-receptor pair between neighboring cells within each cellular niche
-    calculated by :func:`monkeybread.calc.cellular_niches`.
-
-    Statistical test is as described in :cite:p:`He2021.11.03.467020` (See
-    Figure 4).
-
-    This function is a wrapper around :func:`monkeybread.calc.ligand_receptor_score`
-    and calls this function separately for each niche.
+    calculated by :func:`monkeybread.calc.cellular_niches`. Statistical test is as described 
+    in :cite:p:`He2021.11.03.467020` (See Figure 4). This function is a wrapper around 
+    :func:`monkeybread.calc.ligand_receptor_score` and calls this function separately for 
+    each niche.
 
     Parameters
     ----------
@@ -115,6 +112,7 @@ def ligand_receptor_score_per_niche(
     A dictionary mapping each niche to a sub-dictionary mapping each ligand-receptor 
     pair to its co-expression score.
     """
+
     niche_to_lr_pair_to_score = {}
     for niche, cell_to_neighbors in niche_to_cell_to_neighbors.items():
         
