@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning][].
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [1.0.0] - 2023-08-23
+
+### Changed
+
+- Major refactoring and revamping of the functionality from Verion 0 to 1
+- Refactored pipeline for computing cellular niches
+- Ability to run more exact kernel density estimation in addition to the grid approximation
+- New visualization tools for exploring cell type enrichment in cellular niches
+- New visualization tools for visualizing ligand-receptor co-expression in neighboring cells
+- Ability to download ligand-receptor pairs from OmniPath
+- Removal of many functions deemed reduntant
+- New tutorial notebook
+
 ## [0.6.0] - 2022-12-16
 
 ### Changed
