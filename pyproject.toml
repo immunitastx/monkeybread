@@ -15,6 +15,7 @@ authors = [
 ]
 maintainers = [
     {name = "Immunitas Therapeutics", email = "mbernstein@immunitastx.com"},
+    {name = "Immunitas Therapeutics", email = "mtang@immunitastx.com"}
 ]
 urls.Documentation = "https://monkeybread.readthedocs.io/"
 urls.Source = "https://github.com/immunitastx/monkeybread"
