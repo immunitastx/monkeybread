@@ -31,4 +31,4 @@ For Monkeybread's API manual, please visit the [documentation](https://monkeybre
 
 ### Tutorial
 
-For a tutorial on running Monkeybread, please see the [tutorial](https://monkeybread.readthedocs.io/en/latest/notebooks/tutorial.html).
+For a tutorial on running Monkeybread, please see the [tutorial](https://monkeybread.readthedocs.io/en/latest/notebooks/tutorial.html). This tutorial can also be run in [Google Colab](https://colab.research.google.com/github/immunitastx/monkeybread/blob/main/docs/notebooks/tutorial.ipynb#scrollTo=02d5d5c0).
