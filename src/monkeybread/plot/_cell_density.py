@@ -126,7 +126,7 @@ def location_and_density(
     groupnames: Optional[Union[str, List[str]]] = None,
     plot_density: Optional[bool] = True,
     resolution: Optional[bool] = 10,
-    bandwsith: Optional[float] = 75,
+    bandwidth: Optional[float] = 75,
     dot_size: Optional[Union[float, List[float]]] = 7,
     na_dot_size: Optional[float] = 1.5,
     title: Optional[str] = None,
