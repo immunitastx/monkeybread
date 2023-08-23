@@ -61,9 +61,8 @@ def cell_density(
 
     Returns
     -------
-    plot
-        If `show = False` returns the current figure (if `key` is a mapping) or the current axes
-        (if `key` is a string). If `show = True` returns nothing.
+    If `show = False` returns the current figure (if `key` is a mapping) or the current axes
+    (if `key` is a string). If `show = True` returns nothing.
 
     Example
     -------
@@ -179,9 +178,7 @@ def location_and_density(
 
     Returns
     -------
-    plot
-        If `show = False` returns the current figure and axes.
-        If `show = True` returns nothing.
+    If `show = False` returns the current figure and axes. If `show = True` returns nothing.
 
     Example
     -------
