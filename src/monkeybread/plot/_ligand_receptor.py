@@ -7,11 +7,13 @@ from typing import Dict, List, Optional, Tuple, Union, Set
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
 from anndata import AnnData
 import itertools
 from collections import defaultdict
 import matplotlib.colors as mcolors
+from sklearn.preprocessing import scale
 
 from ._embedding_other import embedding_filter, embedding_zoom
 
@@ -299,7 +301,6 @@ def ligand_receptor_embedding_zoom(
 
     Example
     -------
-
     .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/ligand_receptor_score_embedding_zoom.png
     """
     # Score each neighbor pair for ligand-receptor expression
@@ -430,6 +431,10 @@ def ligand_receptor_scatter(
     -------
     If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
     within.
+
+    Example
+    -------
+    .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/ligand_receptor_scatter.png
     """
     if ax is None:
         ax = plt.axes()
@@ -459,3 +464,174 @@ def ligand_receptor_scatter(
         plt.show()
     else:
         return ax
+
+
+def ligand_receptor_score_barplot_per_niche(
+        niche_to_lr_to_score: Dict[str, Dict[Tuple[str, str], float]], 
+        lr_pair: List[Tuple[str, str]], 
+        plot_niches: Optional[List[str]]=None,
+        ax: Optional[plt.Axes]=None,
+        title: Optional[str]=None,
+        show: Optional[bool]=True,
+        **barplot_kwargs
+    ) -> Union[None, plt.Axes]:
+    """
+    Create a barplot showing the ligand/receptor score for a specific ligand/receptor
+    pair within each niche. This function plots the data returned by 
+    :func:`monkeybread.calc.ligand_receptor_score_per_niche`.
+
+    Parameters
+    ----------
+    niche_to_lr_to_score
+        A dictionary mapping each niche to a sub-dictionary mapping each ligand/receptor 
+        (represented as a tuple) to its score in that niche. This data structure is 
+        returned by :func:`monkeybread.calc.ligand_receptor_score_per_niche`
+    lr_pair
+        Specific ligand/receptor pair to plot
+    plot_niches
+        Specific niches to plot. If `None`, all niches will be plotted
+    ax
+        Axes object to plot
+    title
+        Title of figure
+    show
+        If `True`, show the plot. If `False` return the Axes object the plot is contained
+        within
+    barplot_kwargs
+        Arguments passed to :func:`seaborn.barplot`
+    
+    Returns
+    -------
+    If `show = True`, returns nothing. Otherwise, returns the Axes object the plot is contained
+    within.
+
+    Example
+    -------
+    .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/ligand_receptor_score_barplot_per_niche.png
+    """
+    if ax is None:
+        ax = plt.axes()
+
+    da = []
+    if not plot_niches:
+        plot_niches = sorted(niche_to_lr_to_score.keys())
+    for niche in plot_niches:
+        lr_to_score = niche_to_lr_to_score[niche] 
+        da.append((niche, lr_to_score[lr_pair]))
+    plot_df = pd.DataFrame(
+        data=da,
+        columns=['Niche', 'Ligand/Receptor Score']
+    )
+    sns.barplot(
+        plot_df, 
+        x='Niche', 
+        y='Ligand/Receptor Score', 
+        ax=ax,
+        order=plot_niches,
+        **barplot_kwargs
+    )
+    if title:
+        ax.set_title
+    else:
+        ax.set_title(
+            f'{lr_pair[0]}/{lr_pair[1]} Co-expression Score'
+        )
+    if show:
+        plt.show()
+    else:
+        return ax
+
+
+def ligand_receptor_score_heatmap_per_niche(
+        niche_to_lr_to_score: Dict[str, Dict[Tuple[str, str], float]],
+        lr_pairs: Optional[List[Tuple[str,str]]]=None,
+        plot_niches: Optional[List[str]]=None,
+        z_score: Optional[List[str]]=True,
+        clip_z: Optional[float]=2.,
+        show: Optional[bool]=True,
+        **clustermap_kwargs
+    ) -> Union[None, sns.matrix.ClusterGrid]:
+    """
+    Create a heatmap showing the ligand/receptor scores for a specific set of 
+    ligand/receptor pairs within each niche. The rows represent ligand/receptors
+    and the columns represent niches. This function plots the data returned by 
+    :func:`monkeybread.calc.ligand_receptor_score_per_niche`.
+
+    Parameters
+    ----------
+    niche_to_lr_to_score
+        A dictionary mapping each niche to a sub-dictionary mapping each ligand/receptor 
+        (represented as a tuple) to its score in that niche. This data structure is 
+        returned by :func:`monkeybread.calc.ligand_receptor_score_per_niche`
+    lr_pairs
+        Specific set of ligand/receptor pairs to plot. If `None`, all ligand/receptor
+        pairs in the `niche_to_lr_to_score` data structure will be plotted
+    plot_niches
+        Specific niches to plot. If `None`, all niches will be plotted
+    z_score
+        If `True` plot the z-score normalized ligand-receptor scores, where the scores
+        are normalized for each ligand/receptor pairs accross all niches
+    clip_z
+        If `z_score` is True, this clips the plotted z-score values at +/- `clip_z`
+    show
+        If `True`, show the plot. If `False` return the ClusterGrid object
+        output by :func:`seaborn.clustermap`
+    clustermap_kwargs
+        Arguments passed to :func:`seaborn.clustermap`
+
+    Returns
+    -------
+    If `show = True`, returns nothing. Otherwise, returns the ClusterGrid object
+    output by :func:`seaborn.clustermap`
+
+    Example
+    -------
+    .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/ligand_receptor_score_heatmap_per_niche.png
+    """
+    da = []
+    if not plot_niches:
+        plot_niches = sorted(niche_to_lr_to_score.keys())
+    if not lr_pairs:
+        any_niche = sorted(niche_to_lr_to_score.keys())[0]
+        lr_pairs = sorted(niche_to_lr_to_score[any_niche].keys())
+
+    da = []
+    for lr_pair in lr_pairs:
+        row = []
+        for niche in plot_niches:
+            score = niche_to_lr_to_score[niche][lr_pair]
+            row.append(score)
+        da.append(row)
+    
+    if z_score:
+        da=scale(da, axis=1)
+    
+    plot_df = pd.DataFrame(      
+        data=da,
+        columns=plot_niches,
+        index=[', '.join(x) for x in lr_pairs]
+    )
+
+    if z_score:
+        if clip_z:
+            vmin=-clip_z
+            vmax=clip_z
+        else:
+            vmin=None
+            vmax=None
+        cg = sns.clustermap(
+            plot_df,
+            vmin=vmin,
+            vmax=vmax,
+            **clustermap_kwargs
+        )
+    else:
+        cg = sns.clustermap(
+            plot_df,
+            **clustermap_kwargs
+        )
+
+    if show:
+        plt.show()
+    else:
+        return cg

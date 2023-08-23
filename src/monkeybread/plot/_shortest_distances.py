@@ -165,6 +165,11 @@ def shortest_distances_pairwise(
     -------
     If `show = False`, returns nothing. Otherwise, returns a single Axes object or a tuple of
     two Axes objects if expected_distances is provided.
+
+    Example
+    -------
+
+    .. image:: https://raw.githubusercontent.com/immunitastx/monkeybread/main/docs/_static/shortest_distances_pairwise.png
     """
 
     if order_y is None:

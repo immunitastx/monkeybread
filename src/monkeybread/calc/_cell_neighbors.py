@@ -39,7 +39,8 @@ def cell_neighbors(
 
     Returns
     -------
-    A mapping from cell ids in `group1` to sets of cell ids in `group2` indicating contact.
+    A mapping from cell ids in `group1` to sets of cell ids in `group2` that are its neighbors 
+    (i.e., within `radius` distance).
     """
     # Convert groups to lists if single group provided
     if type(group1) == str:
@@ -83,7 +84,7 @@ def cell_neighbors_from_masks(
         mask_group2: Iterable[bool],
         basis="X_spatial",
         radius=None,
-    ):
+    ) -> Dict[str, Set[str]]:
     """Calculate cell neighbors.
 
     For each cell within a given group of cells, calculate all neighbors that are members of a
@@ -117,7 +118,8 @@ def cell_neighbors_from_masks(
 
     Returns
     -------
-    A mapping from cell ids in `group1` to sets of cell ids in `group2` indicating contact.
+    A mapping from cell ids in `group1` to sets of cell ids in `group2` that are its 
+    neighbors (i.e., within `radius` distance).
     """
     # Key for coordinates
     obsm_key = basis
@@ -154,3 +156,120 @@ def cell_neighbors_from_masks(
             cell_to_neighbors[cell] = neighbors
 
     return cell_to_neighbors
+
+
+def cell_neighbors_per_niche(
+        adata: AnnData,
+        niche_key: str,
+        groupby: str,
+        group1: Union[str, List[str]],
+        group2: Union[str, List[str]],
+        basis: Optional[str] = "X_spatial",
+        radius: Optional[float] = None,
+    ) -> Dict[str, Dict[str, Set[str]]]:
+    """
+    Calculate cell neighbors, but within the cellular niches calculated by
+    :func:`monkeybread.calc.cellular_niches`.
+
+    This function is a wrapper around :func:`monkebread.calc.cell_neighbors`
+    that calls this function separately on cells within each niche
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix.
+    niche_key
+        The column in `adata.obs` storing the annotated niche of each cells
+        as calculated by :func:`monkeybread.calc.cellular_niches`
+    groupby
+        A categorical column in `adata.obs` to classify groups.
+    group1
+        Either one group or a list of groups from `adata.obs[groupby]`.
+    group2
+        Either one group or a list of groups from `adata.obs[groupby]`.
+    basis
+        Coordinates in `adata.obsm[{basis}]` to use. Defaults to `spatial`.
+    radius
+        The radius in which cells are considered touching. If not provided, will be calculated using
+        half of the average radius of group1 + half of the average radius of group2. This requires
+        width and height columns to be present in `adata.obs`.
+
+    Returns
+    -------
+    A mapping from each niche id to another mapping that maps each cell id in `group1` to sets 
+    of cell ids in `group2` that are its neighbors (i.e., within `radius` distance).
+    """
+    niche_to_cell_to_neighbors = {}
+    for niche in sorted(set(adata.obs[niche_key])):
+        adata_niche = adata[adata.obs[niche_key] == niche]
+
+        cell_to_neighbors = cell_neighbors(
+            adata_niche,
+            groupby,
+            group1,
+            group2,
+            basis,
+            radius,
+        )
+        niche_to_cell_to_neighbors[niche] = cell_to_neighbors
+    return niche_to_cell_to_neighbors
+
+
+def cell_neighbors_per_niche_from_masks(
+        adata: AnnData,
+        niche_key: str,
+        mask_group1: Iterable[bool],
+        mask_group2: Iterable[bool],
+        basis="X_spatial",
+        radius=None,
+    ) -> Dict[str, Dict[str, Set[str]]]:
+    """
+    Calculate cell neighbors, but within the cellular niches calculated by
+    :func:`monkeybread.calc.cellular_niches_from_masks`. This is similar to 
+    :func:`monkeybread.calc.cellular_niches_per_niche`, but differs from it based on how the two 
+    groups are defined. This function accepts two masks (Boolean valued iterables). The first 
+    mask defines the cells in the first group (those indices set to `True`) and the second mask 
+    defines the cells in the second group.
+
+    This function is a wrapper around :func:`monkebread.calc.cell_neighbors_from_masks`
+    that calls this function separately on cells within each niche. 
+
+    Parameters
+    ----------
+    adata
+        Annotated data matrix.
+    mask_group1
+        An iterable of Boolean values specifying cells in the first group (all indices set to `True`).
+    mask_group2
+        An iterable of Boolean values specifying cells in the second group (all indices set to `True`).
+    basis
+        Coordinates in `adata.obsm[basis]` to use. Defaults to `X_spatial`.
+    radius
+        The radius in which cells are considered touching. If not provided, will be calculated using
+        half of the average radius of group1 + half of the average radius of group2. This requires
+        width and height columns to be present in `adata.obs`.
+
+    Returns
+    -------
+    A mapping from each niche id to another mapping that maps each cell id in `group1` to sets 
+    of cell ids in `group2` that are its neighbors (i.e., within `radius` distance).
+    """
+    niche_to_cell_to_neighbors = {}
+    for niche in sorted(set(adata.obs[niche_key])):
+        adata_niche = adata[adata.obs[niche_key] == niche]
+
+        mask_group1_niche = np.array(mask_group1)[adata.obs[niche_key] == niche]
+        mask_group2_niche = np.array(mask_group2)[adata.obs[niche_key] == niche]
+        
+        cell_to_neighbors=cell_neighbors_from_masks(
+            adata_niche,
+            mask_group1_niche,
+            mask_group2_niche,
+            basis,
+            radius,
+        )         
+        niche_to_cell_to_neighbors[niche] = cell_to_neighbors
+    return niche_to_cell_to_neighbors
+
+
+
