@@ -5,7 +5,7 @@ requires = ["hatchling"]
 
 [project]
 name = "monkeybread"
-version = "1.0.0"
+version = "1.0.1"
 description = "Analyze cellular niches in single-cell spatial transcriptomics data"
 readme = "README.md"
 requires-python = ">=3.8"
