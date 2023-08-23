@@ -125,6 +125,8 @@ def location_and_density(
     groups: Union[str, List[str], List[List[str]]],
     groupnames: Optional[Union[str, List[str]]] = None,
     plot_density: Optional[bool] = True,
+    resolution: Optional[bool] = 10,
+    bandwsith: Optional[float] = 75,
     dot_size: Optional[Union[float, List[float]]] = 7,
     na_dot_size: Optional[float] = 1.5,
     title: Optional[str] = None,
@@ -158,6 +160,10 @@ def location_and_density(
         might be ['CD4 T cell', 'CD8 T cell'] that will label the CD4 and CD8 T cells)
     plot_density
         Plot the density plots alongside the embedding plot.
+    resolution
+        Resolution parameter to pass to :func:`monkeybread.calc.cell_density`
+    bandwidth
+        Bandwidth parameter to pass to :func:`monkeybread.calc.cell_density`
     dot_size
         The size of dots in the embedding for the cells of intests (specified in `groups`). To plot
         each group with a different dot size, a list of sizes can be provided.
@@ -314,8 +320,8 @@ def location_and_density(
                 adata,
                 groupby=f'is_{groupname}',
                 groups='True',
-                resolution=15.0,
-                bandwidth=75.
+                resolution=resolution,
+                bandwidth=bandwidth
             )
             alpha=1.0
             cell_density(
