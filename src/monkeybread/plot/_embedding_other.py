@@ -107,9 +107,9 @@ def embedding_zoom(
     fig: Optional[plt.Figure] = None,
     **kwargs,
 ) -> Optional[plt.Figure]:
-    """Shows embeddings of cells in contact with zoomed focus. Can be spatial or any other basis.
+    """Shows embeddings of cells neighboring other cells with zoomed focus.
 
-    Plots the results of :func:`monkeybread.calc.cell_contact`, highlighting the cells in contact.
+    Plots the results of :func:`monkeybread.calc.cell_neighbors`, highlighting the cell neighbors.
     Zooms in on a specific rectangle in the plot, based on fractional coordinate space, for higher-resolution
     viewing.
 

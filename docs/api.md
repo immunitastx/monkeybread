@@ -63,6 +63,7 @@ import monkeybread as mb
     :toctree: generated
 
     stat.shortest_distances
+    stat.shortest_distances_pairwise
     stat.ligand_receptor_score
 ```
 

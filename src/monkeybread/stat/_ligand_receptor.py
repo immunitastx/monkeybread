@@ -16,7 +16,7 @@ import monkeybread as mb
 
 def ligand_receptor_score(
     adata: AnnData,
-    contacts: Dict[str, Set[str]],
+    cell_to_neighbors: Dict[str, Set[str]],
     actual_scores: Dict[Tuple[str, str], float],
     n_perms: Optional[int] = 100
 ) -> Dict[Tuple[str, str], Tuple[np.ndarray, float]]:
@@ -31,8 +31,8 @@ def ligand_receptor_score(
     ----------
     adata
         Annotated data matrix.
-    contacts
-        A dictionary mapping each cell to its neighbors as calculated by :func:`monkeybread.calc.cell_contact`
+    cell_to_neighbors
+        A dictionary mapping each cell to its neighbors as calculated by :func:`monkeybread.calc.cell_neighbors`
     actual_scores
         The observed co-expression scores as calculated by :func:`monkeybread.calc.ligand_receptor_score`
     n_perms
@@ -50,10 +50,10 @@ def ligand_receptor_score(
     lr_to_dist = {lr: np.zeros(n_perms) for lr in actual_scores.keys()}
 
     # Pull out receptor cells as well as counts for each ligand cell for use in permutation
-    receptor_cells = np.array(list(itertools.chain.from_iterable(contacts.values())))
+    receptor_cells = np.array(list(itertools.chain.from_iterable(cell_to_neighbors.values())))
     # Note that this corresponds to the starting index for each ligand_cell in the above receptor
     # cell array
-    ligand_index_starts = np.array([0] + list(itertools.accumulate(len(v) for v in contacts.values())))
+    ligand_index_starts = np.array([0] + list(itertools.accumulate(len(v) for v in cell_to_neighbors.values())))
 
     # Iterate over permutations
     for i in tqdm(range(n_perms)):
@@ -62,7 +62,7 @@ def ligand_receptor_score(
         # number of linkages for each ligand and receptor
         perm_i_lcell_to_rcells = {
             lcell: receptor_cells[idx_start : idx_start + len(rcells)]
-            for (lcell, rcells), idx_start in zip(contacts.items(), ligand_index_starts)
+            for (lcell, rcells), idx_start in zip(cell_to_neighbors.items(), ligand_index_starts)
         }
 
         # Use permutation "contact" to generate scores
